@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Building, Phone, MapPin, Plus, Search, Filter, ShieldCheck, 
   Coins, Scale, Award, ArrowUpRight, CheckCircle2, Clock, DollarSign, UserCheck,
@@ -82,6 +82,58 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     window.addEventListener('wheel', handleWheel, { passive: true });
     return () => window.removeEventListener('wheel', handleWheel);
   }, []);
+
+  // Live Camera Capture States & Stream Handlers
+  const [activeCameraTarget, setActiveCameraTarget] = useState(null); // 'CUSTOMER' | 'ITEM' | null
+  const [cameraStream, setCameraStream] = useState(null);
+  const videoRef = useRef(null);
+
+  const startCamera = async (target) => {
+    setActiveCameraTarget(target);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+      setCameraStream(stream);
+    } catch (err) {
+      console.error('Camera Access Error:', err);
+      alert('Camera access error: ' + (err.message || 'Permission denied') + '. Please grant camera permission or use Gallery upload.');
+      setActiveCameraTarget(null);
+    }
+  };
+
+  useEffect(() => {
+    if (activeCameraTarget && cameraStream && videoRef.current) {
+      videoRef.current.srcObject = cameraStream;
+    }
+  }, [activeCameraTarget, cameraStream]);
+
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+    setActiveCameraTarget(null);
+  };
+
+  const capturePhotoFromCamera = () => {
+    if (!videoRef.current) return;
+    const video = videoRef.current;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+    if (activeCameraTarget === 'CUSTOMER') {
+      setCustomerPhoto(dataUrl);
+    } else if (activeCameraTarget === 'ITEM') {
+      setItemPhoto(dataUrl);
+    }
+
+    stopCamera();
+  };
 
   // Form states for New Girvi Entry
   const todayStr = new Date().toISOString().split('T')[0];
@@ -472,27 +524,64 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                 />
               </div>
 
-              {/* Customer Photo Upload */}
+              {/* Customer Photo Upload & Live Camera */}
               <div style={{ marginTop: '14px' }}>
-                <label className="input-label">Customer Photo (Select from Gallery or Camera)</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginTop: '6px' }}>
-                  <label className="btn-outline" style={{ cursor: 'pointer', padding: '10px 16px', fontSize: '0.85rem' }}>
-                    <Camera size={16} />
-                    <span>Upload / Capture Photo</span>
+                <label className="input-label">Customer Photo (Select from Gallery or Click Camera)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '6px', flexWrap: 'wrap' }}>
+                  {/* Gallery File Picker */}
+                  <label className="btn-outline" style={{ cursor: 'pointer', padding: '8px 14px', fontSize: '0.84rem' }}>
+                    <Upload size={16} />
+                    <span>Choose from Gallery</span>
                     <input
                       type="file"
                       accept="image/*"
-                      capture="environment"
                       onChange={(e) => handlePhotoUpload(e, setCustomerPhoto)}
                       style={{ display: 'none' }}
                     />
                   </label>
+
+                  {/* Live Camera Button */}
+                  <button
+                    type="button"
+                    className="btn-gold"
+                    onClick={() => startCamera('CUSTOMER')}
+                    style={{ padding: '8px 14px', fontSize: '0.84rem', minHeight: '38px' }}
+                  >
+                    <Camera size={16} />
+                    <span>Click Photo (Camera)</span>
+                  </button>
+
                   {customerPhoto && (
-                    <img 
-                      src={customerPhoto} 
-                      alt="Customer Preview" 
-                      style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--gold-primary)' }} 
-                    />
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                      <img 
+                        src={customerPhoto} 
+                        alt="Customer Preview" 
+                        style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover', border: '1.5px solid var(--gold-primary)' }} 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setCustomerPhoto(null)}
+                        style={{
+                          position: 'absolute',
+                          top: '-6px',
+                          right: '-6px',
+                          background: '#ef4444',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '18px',
+                          height: '18px',
+                          cursor: 'pointer',
+                          fontSize: '10px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                        title="Remove photo"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -655,27 +744,64 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                 />
               </div>
 
-              {/* Item Photo Upload */}
+              {/* Item Photo Upload & Live Camera */}
               <div style={{ marginTop: '14px' }}>
-                <label className="input-label">Item Photo (Select from Gallery or Camera)</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginTop: '6px' }}>
-                  <label className="btn-outline" style={{ cursor: 'pointer', padding: '10px 16px', fontSize: '0.85rem' }}>
-                    <Camera size={16} />
-                    <span>Upload / Capture Item Photo</span>
+                <label className="input-label">Item Photo (Select from Gallery or Click Camera)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '6px', flexWrap: 'wrap' }}>
+                  {/* Gallery File Picker */}
+                  <label className="btn-outline" style={{ cursor: 'pointer', padding: '8px 14px', fontSize: '0.84rem' }}>
+                    <Upload size={16} />
+                    <span>Choose from Gallery</span>
                     <input
                       type="file"
                       accept="image/*"
-                      capture="environment"
                       onChange={(e) => handlePhotoUpload(e, setItemPhoto)}
                       style={{ display: 'none' }}
                     />
                   </label>
+
+                  {/* Live Camera Button */}
+                  <button
+                    type="button"
+                    className="btn-gold"
+                    onClick={() => startCamera('ITEM')}
+                    style={{ padding: '8px 14px', fontSize: '0.84rem', minHeight: '38px' }}
+                  >
+                    <Camera size={16} />
+                    <span>Click Photo (Camera)</span>
+                  </button>
+
                   {itemPhoto && (
-                    <img 
-                      src={itemPhoto} 
-                      alt="Item Preview" 
-                      style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--gold-primary)' }} 
-                    />
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                      <img 
+                        src={itemPhoto} 
+                        alt="Item Preview" 
+                        style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover', border: '1.5px solid var(--gold-primary)' }} 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setItemPhoto(null)}
+                        style={{
+                          position: 'absolute',
+                          top: '-6px',
+                          right: '-6px',
+                          background: '#ef4444',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '18px',
+                          height: '18px',
+                          cursor: 'pointer',
+                          fontSize: '10px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                        title="Remove photo"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -1033,6 +1159,53 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
           shop={shop}
           onClose={() => setSelectedGirviForPrint(null)}
         />
+      )}
+
+      {/* Live Camera Stream Capture Overlay Modal */}
+      {activeCameraTarget && (
+        <div className="receipt-modal-backdrop" style={{ zIndex: 1000 }}>
+          <div className="glass-card" style={{ maxWidth: '560px', width: '100%', padding: '24px', textAlign: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--gold-light)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Camera size={20} color="var(--gold-primary)" />
+                <span>Capture {activeCameraTarget === 'CUSTOMER' ? 'Customer' : 'Item'} Photo</span>
+              </h3>
+              <button onClick={stopCamera} className="btn-outline" style={{ padding: '4px 8px', color: '#fca5a5' }}>
+                <Trash2 size={16} />
+              </button>
+            </div>
+
+            <div style={{ position: 'relative', background: '#000', borderRadius: '12px', overflow: 'hidden', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--card-border)' }}>
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', marginTop: '20px', justifyContent: 'center' }}>
+              <button
+                type="button"
+                className="btn-gold"
+                onClick={capturePhotoFromCamera}
+                style={{ padding: '12px 24px', fontSize: '1rem', flex: 1 }}
+              >
+                <Camera size={20} />
+                <span>Snap & Save Photo</span>
+              </button>
+              <button
+                type="button"
+                className="btn-outline"
+                onClick={stopCamera}
+                style={{ padding: '12px 20px', fontSize: '0.9rem' }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>
