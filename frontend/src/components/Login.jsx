@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, Sparkles, KeyRound } from 'lucide-react';
+import { Phone, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, KeyRound } from 'lucide-react';
 
 export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }) {
   const [mobile, setMobile] = useState('');
@@ -19,7 +19,7 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
     }
 
     if (!pin || pin.length < 4) {
-      setError('Please enter your 4-digit or 6-digit shop PIN.');
+      setError('Please enter your shop PIN.');
       return;
     }
 
@@ -45,12 +45,6 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleFillDemo = () => {
-    setMobile('9876543210');
-    setPin('1234');
-    setError('');
   };
 
   return (
@@ -96,7 +90,7 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
             <input
               type="tel"
               className="custom-input"
-              placeholder="e.g. 9876543210"
+              placeholder="Enter Registered Mobile Number"
               maxLength={10}
               value={mobile}
               onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
@@ -116,7 +110,7 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
             <input
               type={showPin ? 'text' : 'password'}
               className="custom-input"
-              placeholder="Enter PIN (e.g. 1234)"
+              placeholder="Enter Security PIN"
               maxLength={6}
               value={pin}
               onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
@@ -156,46 +150,31 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
         </button>
       </form>
 
-      {/* Demo Credentials Quick Fill */}
+      {/* Switch to Register */}
       <div style={{
-        marginTop: '20px',
+        marginTop: '24px',
         paddingTop: '16px',
         borderTop: '1px dashed rgba(229, 193, 88, 0.2)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '10px'
+        textAlign: 'center'
       }}>
+        <span style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+          New Jeweller Shop?{' '}
+        </span>
         <button
           type="button"
-          onClick={handleFillDemo}
-          className="btn-outline"
-          style={{ width: '100%', padding: '10px', fontSize: '0.84rem' }}
+          onClick={onSwitchToRegister}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--gold-light)',
+            fontWeight: 700,
+            fontSize: '0.88rem',
+            cursor: 'pointer',
+            textDecoration: 'underline'
+          }}
         >
-          <Sparkles size={14} color="var(--gold-primary)" />
-          Quick Auto-Fill Demo Credentials (1234)
+          Register Your Shop Here
         </button>
-
-        <div style={{ textAlign: 'center', marginTop: '6px' }}>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-            New Jeweller Shop?{' '}
-          </span>
-          <button
-            type="button"
-            onClick={onSwitchToRegister}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--gold-light)',
-              fontWeight: 700,
-              fontSize: '0.88rem',
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
-          >
-            Register Your Shop Here
-          </button>
-        </div>
       </div>
     </div>
   );

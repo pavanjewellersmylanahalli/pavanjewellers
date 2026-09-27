@@ -26,20 +26,8 @@ if (supabaseUrl && supabaseKey && !supabaseUrl.includes('your-project') && !supa
   console.log('⚠️ Supabase credentials not provided or default. Running in mock DB storage mode.');
 }
 
-// In-Memory Fallback Storage (if Supabase is not connected yet)
-const memoryShops = [
-  {
-    id: 'demo-shop-1',
-    shop_name: 'Pavan Jewellers Main Branch',
-    login_mobile: '9876543210',
-    reg_mobile: '9876543210',
-    // PIN: 1234
-    pin_hash: bcrypt.hashSync('1234', 10),
-    address: 'Main Bazaar, Jewelers Market, Mylanahalli',
-    created_at: new Date().toISOString()
-  }
-];
-
+// Storage
+const memoryShops = [];
 const memoryOTPs = new Map(); // mobile -> { otp, expiresAt, verified }
 
 // Twilio Setup

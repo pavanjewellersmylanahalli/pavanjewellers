@@ -297,11 +297,6 @@ export default function Register({ onRegisterSuccess, onSwitchToLogin, apiBaseUr
                 Change Number
               </button>
             </div>
-            {isDevOtp && (
-              <div style={{ marginTop: '8px', fontSize: '0.82rem', color: '#fcd34d', fontWeight: 600 }}>
-                💡 Quick Dev Code: Use OTP <span style={{ background: '#3b0764', padding: '2px 8px', borderRadius: '4px', border: '1px solid #c084fc' }}>123456</span>
-              </div>
-            )}
           </div>
 
           {/* 6-Digit OTP Boxes */}
