@@ -14,8 +14,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('TOTAL_LEDGER');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Dynamic API Base URL (Uses Render URL in production, Vite proxy in dev)
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
+  // Dynamic API Base URL (Defaults to Render backend URL)
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://pavan-jewellers-backend.onrender.com';
 
   // Pre-warm backend server immediately on app launch & keep-alive every 4 mins
   useEffect(() => {

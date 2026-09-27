@@ -3,6 +3,22 @@ import { Phone, Lock, Eye, EyeOff, Building, MapPin, CheckCircle2, ArrowRight, S
 import confetti from 'canvas-confetti';
 
 export default function Register({ onRegisterSuccess, onSwitchToLogin, apiBaseUrl }) {
+  const effectiveApiBaseUrl = (apiBaseUrl && apiBaseUrl.trim() !== '')
+    ? apiBaseUrl
+    : (import.meta.env.VITE_API_BASE_URL || 'https://pavan-jewellers-backend.onrender.com');
+
+  const parseJsonResponse = async (response) => {
+    const text = await response.text();
+    try {
+      return JSON.parse(text);
+    } catch (err) {
+      if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+        throw new Error('Backend API server is starting up or temporarily offline on Render. Please wait 10 seconds and try again.');
+      }
+      throw new Error('Invalid response format received from server.');
+    }
+  };
+
   // Wizard Steps: 1 = Registration Mobile, 2 = Verify Twilio OTP, 3 = Shop Details & Login Mobile Setup
   const [step, setStep] = useState(1);
 
@@ -49,13 +65,13 @@ export default function Register({ onRegisterSuccess, onSwitchToLogin, apiBaseUr
     setLoading(true);
 
     try {
-      const response = await fetch(`${apiBaseUrl}/api/auth/send-otp`, {
+      const response = await fetch(`${effectiveApiBaseUrl}/api/auth/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reg_mobile: cleaned })
       });
 
-      const data = await response.json();
+      const data = await parseJsonResponse(response);
 
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to send verification OTP via Twilio.');
@@ -114,7 +130,7 @@ export default function Register({ onRegisterSuccess, onSwitchToLogin, apiBaseUr
     setLoading(true);
 
     try {
-      const response = await fetch(`${apiBaseUrl}/api/auth/verify-otp`, {
+      const response = await fetch(`${effectiveApiBaseUrl}/api/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -123,7 +139,7 @@ export default function Register({ onRegisterSuccess, onSwitchToLogin, apiBaseUr
         })
       });
 
-      const data = await response.json();
+      const data = await parseJsonResponse(response);
 
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Invalid verification OTP code.');
@@ -169,7 +185,7 @@ export default function Register({ onRegisterSuccess, onSwitchToLogin, apiBaseUr
     setLoading(true);
 
     try {
-      const response = await fetch(`${apiBaseUrl}/api/auth/register-shop`, {
+      const response = await fetch(`${effectiveApiBaseUrl}/api/auth/register-shop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -181,7 +197,7 @@ export default function Register({ onRegisterSuccess, onSwitchToLogin, apiBaseUr
         })
       });
 
-      const data = await response.json();
+      const data = await parseJsonResponse(response);
 
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to register shop.');

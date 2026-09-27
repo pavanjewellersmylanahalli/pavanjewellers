@@ -2,6 +2,22 @@ import React, { useState } from 'react';
 import { Phone, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, KeyRound, X, RefreshCw, CheckCircle2 } from 'lucide-react';
 
 export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }) {
+  const effectiveApiBaseUrl = (apiBaseUrl && apiBaseUrl.trim() !== '')
+    ? apiBaseUrl
+    : (import.meta.env.VITE_API_BASE_URL || 'https://pavan-jewellers-backend.onrender.com');
+
+  const parseJsonResponse = async (response) => {
+    const text = await response.text();
+    try {
+      return JSON.parse(text);
+    } catch (err) {
+      if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+        throw new Error('Backend API server is starting up or temporarily offline on Render. Please wait 10 seconds and try again.');
+      }
+      throw new Error('Invalid response format received from server.');
+    }
+  };
+
   const [mobile, setMobile] = useState('');
   const [pin, setPin] = useState('');
   const [showPin, setShowPin] = useState(false);
@@ -41,13 +57,13 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
     setLoading(true);
 
     try {
-      const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
+      const response = await fetch(`${effectiveApiBaseUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ login_mobile: cleanedMobile, pin })
       });
 
-      const data = await response.json();
+      const data = await parseJsonResponse(response);
 
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Invalid credentials or mobile number not registered.');
@@ -89,13 +105,13 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
     setResetLoading(true);
 
     try {
-      const response = await fetch(`${apiBaseUrl}/api/auth/reset-pin/send-otp`, {
+      const response = await fetch(`${effectiveApiBaseUrl}/api/auth/reset-pin/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ login_mobile: cleanedMobile })
       });
 
-      const data = await response.json();
+      const data = await parseJsonResponse(response);
 
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to send OTP for PIN reset.');
@@ -134,7 +150,7 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
     setResetLoading(true);
 
     try {
-      const response = await fetch(`${apiBaseUrl}/api/auth/reset-pin/confirm`, {
+      const response = await fetch(`${effectiveApiBaseUrl}/api/auth/reset-pin/confirm`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -144,7 +160,7 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
         })
       });
 
-      const data = await response.json();
+      const data = await parseJsonResponse(response);
 
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to reset PIN.');
@@ -163,8 +179,8 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
   };
 
   const triggerPrewarm = () => {
-    if (apiBaseUrl) {
-      fetch(`${apiBaseUrl}/api/health`).catch(() => {});
+    if (effectiveApiBaseUrl) {
+      fetch(`${effectiveApiBaseUrl}/api/health`).catch(() => {});
     }
   };
 
