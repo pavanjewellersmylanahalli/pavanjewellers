@@ -84,7 +84,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const todayStr = new Date().toISOString().split('T')[0];
   const nextYearStr = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-  const [pledgeNumber, setPledgeNumber] = useState(`GV-${Date.now().toString().slice(-6)}`);
+  const [pledgeNumber, setPledgeNumber] = useState('');
   const [pledgeDate, setPledgeDate] = useState(todayStr);
   const [dueDate, setDueDate] = useState(nextYearStr);
   
@@ -195,13 +195,13 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const handleCreateNewGirvi = (e) => {
     e.preventDefault();
     
-    if (!customerName || !mobile || !address || !articleName || !grossWt || !loanAmount) {
-      alert('Please fill in all required fields marked with *');
+    if (!pledgeNumber.trim() || !customerName || !mobile || !address || !articleName || !grossWt || !loanAmount) {
+      alert('Please fill in all required fields marked with * (including Pledge Number)');
       return;
     }
 
     const newRecord = {
-      id: pledgeNumber || `GV-${Date.now().toString().slice(-6)}`,
+      id: pledgeNumber.trim(),
       pledgeDate,
       dueDate,
       customerName: customerName.trim(),
@@ -241,7 +241,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     }
 
     // Reset Form
-    setPledgeNumber(`GV-${Date.now().toString().slice(-6)}`);
+    setPledgeNumber('');
     setCustomerName('');
     setRelationName('');
     setMobile('');
@@ -331,6 +331,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                   <input
                     type="text"
                     className="custom-input"
+                    placeholder="Enter Pledge Number"
                     value={pledgeNumber}
                     onChange={(e) => setPledgeNumber(e.target.value)}
                     required
