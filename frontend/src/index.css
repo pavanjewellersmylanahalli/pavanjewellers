@@ -3,20 +3,20 @@
 :root {
   --font-main: 'Outfit', sans-serif;
   --font-serif: 'Cinzel', serif;
-  
+
   --bg-dark: #0f0508;
   --bg-gradient: radial-gradient(circle at 50% 20%, #2b0b13 0%, #120407 60%, #080204 100%);
-  
+
   --gold-primary: #e5c158;
   --gold-light: #fef1c9;
   --gold-dark: #b88a28;
   --gold-gradient: linear-gradient(135deg, #fceaa7 0%, #e5c158 50%, #996c14 100%);
   --gold-glow: 0 0 25px rgba(229, 193, 88, 0.25);
-  
+
   --card-bg: rgba(26, 12, 18, 0.85);
   --card-border: rgba(229, 193, 88, 0.22);
   --card-border-hover: rgba(229, 193, 88, 0.45);
-  
+
   --text-main: #f8fafc;
   --text-muted: #a1a1aa;
   --text-gold: #f3d478;
@@ -47,13 +47,16 @@ body {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: #0f0508;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #4a1924;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--gold-dark);
 }
@@ -366,8 +369,15 @@ input[type=number] {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Sidebar Styles */
@@ -492,8 +502,13 @@ input[type=number] {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ================= PAWN TICKET RECEIPT & PRINT STYLES ================= */
@@ -604,7 +619,8 @@ input[type=number] {
   letter-spacing: 1px;
 }
 
-.shop-address, .shop-contact {
+.shop-address,
+.shop-contact {
   font-size: 0.7rem;
   color: #222222;
 }
@@ -746,7 +762,8 @@ input[type=number] {
   margin-bottom: 6px;
 }
 
-.pawn-articles-table th, .pawn-articles-table td {
+.pawn-articles-table th,
+.pawn-articles-table td {
   border: 1px solid #000;
   padding: 3px 5px;
   vertical-align: middle;
@@ -773,8 +790,13 @@ input[type=number] {
   font-weight: 700;
 }
 
-.center-txt { text-align: center; }
-.bold-txt { font-weight: 800; }
+.center-txt {
+  text-align: center;
+}
+
+.bold-txt {
+  font-weight: 800;
+}
 
 .kannada-note-box {
   text-align: center;
@@ -793,14 +815,14 @@ input[type=number] {
   margin-bottom: 8px;
 }
 
-.summary-bar-grid > div {
+.summary-bar-grid>div {
   flex: 1;
   text-align: center;
   padding: 3px;
   border-right: 1px solid #000;
 }
 
-.summary-bar-grid > div:last-child {
+.summary-bar-grid>div:last-child {
   border-right: none;
 }
 
@@ -878,10 +900,12 @@ input[type=number] {
 @media print {
   @page {
     size: A4 landscape;
-    margin: 0 !important; /* Removes browser top/bottom headers, footers, timestamps & URLs */
+    margin: 0 !important;
+    /* Removes browser top/bottom headers, footers, timestamps & URLs */
   }
 
-  html, body {
+  html,
+  body {
     margin: 0 !important;
     padding: 0 !important;
     background: #ffffff !important;
@@ -922,7 +946,8 @@ input[type=number] {
     margin: 0 auto !important;
     width: 100% !important;
     max-width: 100% !important;
-    height: 196mm !important; /* Fills full height of A4 Landscape */
+    height: 296mm !important;
+    /* Fills full height of A4 Landscape */
     display: flex !important;
     flex-direction: row !important;
     gap: 4mm !important;
@@ -934,13 +959,15 @@ input[type=number] {
     flex: 1 !important;
     min-width: 0 !important;
     width: 48.5% !important;
-    height: 100% !important; /* Stretches ticket to 100% of 196mm height */
+    height: 100% !important;
+    /* Stretches ticket to 100% of 196mm height */
     box-sizing: border-box !important;
     padding: 10px 12px !important;
     border: 2px solid #000000 !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important; /* Stretches sections vertically */
+    justify-content: space-between !important;
+    /* Stretches sections vertically */
   }
 
   .ticket-tear-line {
@@ -960,7 +987,8 @@ input[type=number] {
     font-size: 1.35rem !important;
   }
 
-  .pawn-articles-table th, .pawn-articles-table td {
+  .pawn-articles-table th,
+  .pawn-articles-table td {
     padding: 5px 6px !important;
     font-size: 0.8rem !important;
   }
@@ -969,7 +997,8 @@ input[type=number] {
     height: 32px !important;
   }
 
-  .sig-box-left, .sig-box-right {
+  .sig-box-left,
+  .sig-box-right {
     min-height: 110px !important;
   }
 
@@ -977,6 +1006,3 @@ input[type=number] {
     margin-top: 30px !important;
   }
 }
-
-
-
