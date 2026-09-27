@@ -3,6 +3,48 @@
  */
 
 /**
+ * Converts any date format (DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD, ISO string, etc.)
+ * into YYYY-MM-DD string required for HTML <input type="date"> value.
+ * @param {string|Date} dateStr 
+ * @returns {string} Date in YYYY-MM-DD format
+ */
+export function toIsoDate(dateStr) {
+  if (!dateStr) return new Date().toISOString().split('T')[0];
+  const str = String(dateStr).trim();
+  if (!str) return new Date().toISOString().split('T')[0];
+
+  // If already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    return str;
+  }
+
+  // If DD/MM/YYYY or DD-MM-YYYY
+  const dmyMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (dmyMatch) {
+    const [_, dd, mm, yyyy] = dmyMatch;
+    return `${yyyy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+  }
+
+  // If YYYY-MM-DDTHH:mm:ss
+  const ymdMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (ymdMatch) {
+    const [_, yyyy, mm, dd] = ymdMatch;
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  try {
+    const d = new Date(str);
+    if (isNaN(d.getTime())) return new Date().toISOString().split('T')[0];
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  } catch (e) {
+    return new Date().toISOString().split('T')[0];
+  }
+}
+
+/**
  * Formats any date string (YYYY-MM-DD, ISO string, etc.) into DD/MM/YYYY format strictly.
  * @param {string|Date} dateStr 
  * @returns {string} Date formatted as DD/MM/YYYY
@@ -39,25 +81,19 @@ export function formatDate(dateStr) {
 /**
  * Calculates the due date automatically as exactly 1 year and 1 month from the pledge date.
  * Returns ISO date format YYYY-MM-DD suitable for HTML <input type="date"> value.
- * @param {string} pledgeDateStr (YYYY-MM-DD)
+ * @param {string} pledgeDateStr (YYYY-MM-DD or DD/MM/YYYY)
  * @returns {string} Due date in YYYY-MM-DD format
  */
 export function calculateDueDate(pledgeDateStr) {
   if (!pledgeDateStr) return '';
 
-  let yyyy, mm, dd;
-  const ymdMatch = String(pledgeDateStr).match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (ymdMatch) {
-    yyyy = parseInt(ymdMatch[1], 10);
-    mm = parseInt(ymdMatch[2], 10) - 1; // 0-indexed month
-    dd = parseInt(ymdMatch[3], 10);
-  } else {
-    const d = new Date(pledgeDateStr);
-    if (isNaN(d.getTime())) return '';
-    yyyy = d.getFullYear();
-    mm = d.getMonth();
-    dd = d.getDate();
-  }
+  const isoPledge = toIsoDate(pledgeDateStr);
+  const ymdMatch = isoPledge.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!ymdMatch) return '';
+
+  const yyyy = parseInt(ymdMatch[1], 10);
+  const mm = parseInt(ymdMatch[2], 10) - 1; // 0-indexed month
+  const dd = parseInt(ymdMatch[3], 10);
 
   // 1 year and 1 month = 13 months
   let targetYear = yyyy + 1;

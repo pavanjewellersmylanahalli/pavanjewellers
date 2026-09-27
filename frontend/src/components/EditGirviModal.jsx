@@ -2,14 +2,17 @@ import React, { useState, useRef } from 'react';
 import { 
   X, Save, Edit3, Camera, Upload, User, Coins, Scale, DollarSign, Calendar
 } from 'lucide-react';
-import { calculateDueDate, numberToWordsINR } from '../utils/dateUtils';
+import { calculateDueDate, numberToWordsINR, toIsoDate } from '../utils/dateUtils';
 
 export default function EditGirviModal({ girvi, onClose, onSave }) {
   if (!girvi) return null;
 
+  const initialPledgeDate = toIsoDate(girvi.pledgeDate || girvi.date);
+  const initialDueDate = toIsoDate(girvi.dueDate || calculateDueDate(initialPledgeDate));
+
   const [pledgeNumber, setPledgeNumber] = useState(girvi.id || '');
-  const [pledgeDate, setPledgeDate] = useState(girvi.pledgeDate || girvi.date || new Date().toISOString().split('T')[0]);
-  const [dueDate, setDueDate] = useState(girvi.dueDate || calculateDueDate(girvi.pledgeDate || new Date().toISOString().split('T')[0]));
+  const [pledgeDate, setPledgeDate] = useState(initialPledgeDate);
+  const [dueDate, setDueDate] = useState(initialDueDate);
   
   const [customerName, setCustomerName] = useState(girvi.customerName || '');
   const [relationType, setRelationType] = useState(girvi.relationType || 'S/O');
