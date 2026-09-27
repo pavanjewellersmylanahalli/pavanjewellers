@@ -3,6 +3,7 @@ import {
   X, BookOpen, Plus, DollarSign, Calendar, FileText, ArrowDownRight, 
   ArrowUpRight, Coins, Printer, Trash2, CheckCircle2, AlertCircle, Scale, User, Save
 } from 'lucide-react';
+import { formatDate } from '../utils/dateUtils';
 
 export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
   if (!girvi) return null;
@@ -192,7 +193,7 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
               <div style={{ fontWeight: 800, color: '#ffffff', fontSize: '0.94rem', marginTop: '1px' }}>
                 {girvi.customerName} {girvi.relationType && girvi.relationName ? `(${girvi.relationType} ${girvi.relationName})` : ''}
               </div>
-              <div style={{ color: 'var(--text-gold)', fontSize: '0.78rem', marginTop: '1px' }}>📞 +91 {girvi.mobile}</div>
+              <div style={{ color: 'var(--text-gold)', fontSize: '0.78rem', marginTop: '1px' }}>📞 {girvi.mobile ? `+91 ${girvi.mobile}` : 'No Mobile'}</div>
             </div>
 
             <div>
@@ -204,10 +205,12 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
             </div>
 
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 700 }}>PLEDGE DATE & INTEREST RATE</div>
-              <div style={{ fontWeight: 700, color: '#ffffff', marginTop: '1px' }}>{girvi.pledgeDate || girvi.date}</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 700 }}>PLEDGE DATE & DUE DATE</div>
+              <div style={{ fontWeight: 700, color: '#ffffff', marginTop: '1px' }}>
+                {formatDate(girvi.pledgeDate || girvi.date)} {girvi.dueDate ? `| Due: ${formatDate(girvi.dueDate)}` : ''}
+              </div>
               <div style={{ color: '#34d399', fontWeight: 700, fontSize: '0.78rem', marginTop: '1px' }}>
-                Rate: {girvi.monthlyInterestRate || '2'}% Monthly
+                Rate: {girvi.monthlyInterestRate || '1.5'}% Monthly
               </div>
             </div>
           </div>
@@ -355,7 +358,7 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
               <tbody>
                 {/* Initial Creation Row */}
                 <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)', background: 'rgba(255,255,255,0.02)' }}>
-                  <td style={{ padding: '10px', fontWeight: 700, color: 'var(--text-muted)' }}>{girvi.pledgeDate || girvi.date}</td>
+                  <td style={{ padding: '10px', fontWeight: 700, color: 'var(--text-muted)' }}>{formatDate(girvi.pledgeDate || girvi.date)}</td>
                   <td style={{ padding: '10px' }}>
                     <span className="badge-gold" style={{ fontSize: '0.68rem' }}>PLEDGE CREATED</span>
                   </td>
@@ -369,7 +372,7 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
                 {transactions.length > 0 ? (
                   transactions.map((tx) => (
                     <tr key={tx.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                      <td style={{ padding: '10px', fontWeight: 700, color: '#ffffff' }}>{tx.date}</td>
+                      <td style={{ padding: '10px', fontWeight: 700, color: '#ffffff' }}>{formatDate(tx.date)}</td>
                       <td style={{ padding: '10px' }}>
                         {tx.type === 'INTEREST' && (
                           <span className="badge-success" style={{ fontSize: '0.68rem', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
@@ -421,7 +424,7 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
             {/* Initial Loan Creation Mobile Card */}
             <div style={{ background: 'rgba(10, 3, 6, 0.7)', borderRadius: '12px', border: '1px solid rgba(229, 193, 88, 0.3)', padding: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>{girvi.pledgeDate || girvi.date}</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>{formatDate(girvi.pledgeDate || girvi.date)}</span>
                 <span className="badge-gold" style={{ fontSize: '0.66rem' }}>PLEDGE CREATED</span>
               </div>
               <div style={{ fontSize: '0.84rem', fontWeight: 600, color: '#ffffff', marginBottom: '8px' }}>
@@ -448,7 +451,7 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
                 padding: '12px'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ffffff' }}>{tx.date}</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ffffff' }}>{formatDate(tx.date)}</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {tx.type === 'INTEREST' && (
                       <span className="badge-success" style={{ fontSize: '0.66rem' }}>INTEREST PAID</span>

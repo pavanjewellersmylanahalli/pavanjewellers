@@ -1,19 +1,6 @@
 import React from 'react';
 import { X, Printer } from 'lucide-react';
-
-function formatDate(dateStr) {
-  if (!dateStr) return new Date().toLocaleDateString('en-GB');
-  try {
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
-  } catch (e) {
-    return dateStr;
-  }
-}
+import { formatDate } from '../utils/dateUtils';
 
 export default function GirviReceipt({ girvi, shop, onClose }) {
   if (!girvi) return null;
@@ -53,6 +40,7 @@ export default function GirviReceipt({ girvi, shop, onClose }) {
       <div className="ticket-meta-bar">
         <div><strong>No.</strong> <span className="underline-text">{girvi.id}</span></div>
         <div><strong>Date:</strong> <span className="underline-text">{formatDate(girvi.pledgeDate)}</span></div>
+        {girvi.dueDate && <div><strong>Due Date:</strong> <span className="underline-text">{formatDate(girvi.dueDate)}</span></div>}
       </div>
 
       {/* Pawner Info Grid */}

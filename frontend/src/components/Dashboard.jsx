@@ -8,6 +8,8 @@ import {
 
 import GirviReceipt from './GirviReceipt';
 import GirviPassbookModal from './GirviPassbookModal';
+import EditGirviModal from './EditGirviModal';
+import { formatDate, calculateDueDate } from '../utils/dateUtils';
 
 // Helper function to convert Indian Currency numbers to Words
 function numberToWordsINR(num) {
@@ -32,6 +34,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [selectedGirviForPrint, setSelectedGirviForPrint] = useState(null);
   const [selectedGirviForPassbook, setSelectedGirviForPassbook] = useState(null);
+  const [selectedGirviForEdit, setSelectedGirviForEdit] = useState(null);
 
   // Real Girvi items stored in LocalStorage for this shop
   const storageKey = `pavan_girvis_${shop?.id || shop?.login_mobile || 'default'}`;
@@ -213,11 +216,15 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
 
   // Form states for New Girvi Entry
   const todayStr = new Date().toISOString().split('T')[0];
-  const nextYearStr = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
   const [pledgeNumber, setPledgeNumber] = useState('');
   const [pledgeDate, setPledgeDate] = useState(todayStr);
-  const [dueDate, setDueDate] = useState(nextYearStr);
+  const [dueDate, setDueDate] = useState(() => calculateDueDate(todayStr));
+  
+  const handlePledgeDateChange = (val) => {
+    setPledgeDate(val);
+    setDueDate(calculateDueDate(val));
+  };
   
   const [customerName, setCustomerName] = useState('');
   const [relationType, setRelationType] = useState('S/O');
@@ -303,7 +310,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     .filter(i => i.metal === 'Silver')
     .reduce((sum, i) => sum + Number(i.loanAmount || 0), 0);
 
-  const uniqueCustomers = new Set(girvis.map(i => i.mobile)).size;
+  const uniqueCustomers = new Set(girvis.map(i => i.mobile).filter(Boolean)).size;
 
   // Image Upload Handlers
   const handlePhotoUpload = (e, setPhotoState) => {
@@ -353,7 +360,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const handleCreateNewGirvi = (e) => {
     e.preventDefault();
     
-    if (!pledgeNumber.trim() || !customerName || !mobile || !address || !articleName || !grossWt || !loanAmount) {
+    if (!pledgeNumber.trim() || !customerName || !address || !articleName || !grossWt || !loanAmount) {
       alert('Please fill in all required fields marked with * (including Pledge Number)');
       return;
     }
@@ -400,6 +407,8 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
 
     // Reset Form
     setPledgeNumber('');
+    setPledgeDate(todayStr);
+    setDueDate(calculateDueDate(todayStr));
     setCustomerName('');
     setRelationName('');
     setMobile('');
@@ -499,6 +508,22 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     }
   };
 
+  const handleSaveEditedGirvi = (updatedRecord) => {
+    if (!updatedRecord || !updatedRecord.id) return;
+    setGirvis(prev => prev.map(item => item.id === updatedRecord.id ? updatedRecord : item));
+    setSelectedGirviForEdit(null);
+
+    // Sync updated record to Supabase DB
+    if (shop?.id) {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
+      fetch(`${apiBaseUrl}/api/girvis`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shopId: shop.id, girvi: updatedRecord })
+      }).catch(() => {});
+    }
+  };
+
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 16px' }} className="animate-fadeIn">
       
@@ -579,17 +604,16 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                 {/* Mobile Number (Moved to top for instant auto-fill) */}
                 <div className="input-group">
                   <div className="input-label">
-                    <span>Mobile Number *</span>
+                    <span>Mobile Number</span>
                     {isRegularCustomerFound && <span className="badge-success">REGULAR CUSTOMER</span>}
                   </div>
                   <input
                     type="tel"
                     className="custom-input"
-                    placeholder="10-digit Mobile Number"
+                    placeholder="10-digit Mobile Number (Optional)"
                     maxLength={10}
                     value={mobile}
                     onChange={(e) => handleMobileChange(e.target.value)}
-                    required
                     style={{ paddingLeft: '16px', borderColor: isRegularCustomerFound ? '#34d399' : undefined }}
                   />
                 </div>
@@ -601,7 +625,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                     type="date"
                     className="custom-input"
                     value={pledgeDate}
-                    onChange={(e) => setPledgeDate(e.target.value)}
+                    onChange={(e) => handlePledgeDateChange(e.target.value)}
                     required
                     style={{ paddingLeft: '16px', background: '#120407' }}
                   />
@@ -609,7 +633,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
 
                 {/* Due Date */}
                 <div className="input-group">
-                  <label className="input-label">Due Date *</label>
+                  <label className="input-label">Due Date * (Auto 1Yr + 1Mo)</label>
                   <input
                     type="date"
                     className="custom-input"
@@ -1561,13 +1585,13 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                       <tr key={g.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', transition: 'background 0.2s ease' }} className="table-row-hover">
                         <td style={{ padding: '14px', fontWeight: 700, color: 'var(--gold-light)' }}>
                           <div>{g.id}</div>
-                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{g.pledgeDate || g.date}</div>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{formatDate(g.pledgeDate || g.date)}</div>
                         </td>
                         <td style={{ padding: '14px' }}>
                           <div style={{ fontWeight: 600, color: '#ffffff' }}>
                             {g.customerName} {g.relationType && g.relationName ? `(${g.relationType} ${g.relationName})` : ''}
                           </div>
-                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>+91 {g.mobile}</div>
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{g.mobile ? `+91 ${g.mobile}` : 'No Mobile'}</div>
                         </td>
                         <td style={{ padding: '14px', color: '#e2e8f0' }}>
                           <div>{g.articleName || g.itemDescription}</div>
@@ -1618,6 +1642,15 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                             )}
                             <button
                               className="btn-outline"
+                              style={{ padding: '4px 8px', fontSize: '0.75rem', minHeight: '32px', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.4)' }}
+                              onClick={() => setSelectedGirviForEdit(g)}
+                              title="Edit Girvi Bill Entry"
+                            >
+                              <Edit3 size={13} />
+                              <span>Edit</span>
+                            </button>
+                            <button
+                              className="btn-outline"
                               style={{ padding: '4px 8px', fontSize: '0.75rem', minHeight: '32px' }}
                               onClick={() => setSelectedGirviForPrint(g)}
                               title="Print Pawn Ticket (Form 'F')"
@@ -1648,7 +1681,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', paddingBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
                       <div>
                         <span style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--gold-light)' }}>No. {g.id}</span>
-                        <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginLeft: '10px' }}>{g.pledgeDate || g.date}</span>
+                        <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginLeft: '10px' }}>{formatDate(g.pledgeDate || g.date)}</span>
                       </div>
                       {g.status === 'ACTIVE' ? (
                         <span className="badge-gold">ACTIVE</span>
@@ -1663,7 +1696,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                         {g.customerName} {g.relationType && g.relationName ? `(${g.relationType} ${g.relationName})` : ''}
                       </div>
                       <div style={{ fontSize: '0.82rem', color: 'var(--text-gold)', marginTop: '2px' }}>
-                        📞 +91 {g.mobile}
+                        📞 {g.mobile ? `+91 ${g.mobile}` : 'No Mobile'}
                       </div>
                     </div>
 
@@ -1717,6 +1750,15 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                         )}
                         <button
                           className="btn-outline"
+                          style={{ padding: '6px 10px', fontSize: '0.78rem', minHeight: '36px', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.4)' }}
+                          onClick={() => setSelectedGirviForEdit(g)}
+                          title="Edit Bill Entry"
+                        >
+                          <Edit3 size={14} />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          className="btn-outline"
                           style={{ padding: '6px 10px', fontSize: '0.78rem', minHeight: '36px' }}
                           onClick={() => setSelectedGirviForPrint(g)}
                           title="Print Receipt"
@@ -1768,6 +1810,15 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
           girvi={selectedGirviForPrint}
           shop={shop}
           onClose={() => setSelectedGirviForPrint(null)}
+        />
+      )}
+
+      {/* Edit Girvi Bill Entry Modal */}
+      {selectedGirviForEdit && (
+        <EditGirviModal
+          girvi={selectedGirviForEdit}
+          onClose={() => setSelectedGirviForEdit(null)}
+          onSave={handleSaveEditedGirvi}
         />
       )}
 
