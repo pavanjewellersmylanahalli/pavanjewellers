@@ -1301,16 +1301,16 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
 
           <div className="glass-card" style={{ padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Monthly Interest Due</span>
-              <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(234, 179, 8, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#facc15' }}>
-                <Clock size={20} />
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Vault Weight</span>
+              <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(229, 193, 88, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold-primary)' }}>
+                <Coins size={20} />
               </div>
             </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#ffffff' }}>
-              ₹{Math.round(totalMonthlyInterest).toLocaleString('en-IN')}
+            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--gold-light)' }}>
+              {(totalGoldWeight + totalSilverWeight).toFixed(2)} <span style={{ fontSize: '0.9rem', color: '#ffffff', fontWeight: 500 }}>g</span>
             </div>
             <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-              Monthly Accrual
+              Gold: {totalGoldWeight.toFixed(2)} g | Silver: {totalSilverWeight.toFixed(2)} g
             </div>
           </div>
 
