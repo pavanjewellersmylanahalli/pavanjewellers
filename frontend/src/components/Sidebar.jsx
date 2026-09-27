@@ -33,42 +33,14 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose, shop
 
       {/* Sidebar Navigation Panel */}
       <aside className={`sidebar-panel ${isOpen ? 'open' : ''}`}>
-        {/* Sidebar Header */}
-        <div style={{
-          padding: '20px 20px 16px',
-          borderBottom: '1px solid rgba(229, 193, 88, 0.15)',
+        {/* Mobile Close Button */}
+        <div className="sidebar-close-btn" style={{
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
+          justifyContent: 'flex-end',
+          padding: '12px 16px 0'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              background: 'var(--gold-gradient)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#1a080c',
-              boxShadow: '0 4px 12px rgba(229, 193, 88, 0.3)'
-            }}>
-              <Gem size={20} />
-            </div>
-            <div>
-              <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--gold-light)' }}>
-                PAVAN GIRVI
-              </div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                Portal Navigation
-              </div>
-            </div>
-          </div>
-
-          {/* Close button on mobile */}
           <button 
             onClick={onClose}
-            className="sidebar-close-btn"
             style={{
               background: 'none',
               border: 'none',
