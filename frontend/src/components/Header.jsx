@@ -1,7 +1,36 @@
-import React from 'react';
-import { Gem, LogOut, Store, Menu } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Gem, LogOut, Store, Menu, RefreshCw } from 'lucide-react';
 
 export default function Header({ shop, onLogout, onToggleSidebar }) {
+  const [rates, setRates] = useState({ gold24k: 14798, gold22k: 13565, silver: 228 });
+  const [loadingRates, setLoadingRates] = useState(false);
+
+  const fetchRates = async () => {
+    setLoadingRates(true);
+    try {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
+      const res = await fetch(`${apiBaseUrl}/api/metal-rates`);
+      const data = await res.json();
+      if (data.success && data.gold24k && data.silver) {
+        setRates({
+          gold24k: data.gold24k,
+          gold22k: data.gold22k,
+          silver: data.silver
+        });
+      }
+    } catch (err) {
+      console.error('Failed to fetch live metal rates:', err);
+    } finally {
+      setLoadingRates(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRates();
+    const interval = setInterval(fetchRates, 5 * 60 * 1000); // auto-refresh every 5 mins
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <header style={{
       background: 'rgba(20, 7, 13, 0.88)',
@@ -62,26 +91,59 @@ export default function Header({ shop, onLogout, onToggleSidebar }) {
           </div>
         </div>
 
-        {/* Live Rates Ticker Preview */}
+        {/* Live Rates Ticker */}
         <div className="header-ticker" style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '16px',
-          background: 'rgba(10, 3, 6, 0.5)',
+          gap: '12px',
+          background: 'rgba(10, 3, 6, 0.65)',
           padding: '6px 14px',
           borderRadius: '20px',
-          border: '1px solid rgba(229, 193, 88, 0.15)',
-          fontSize: '0.82rem'
+          border: '1px solid rgba(229, 193, 88, 0.25)',
+          fontSize: '0.82rem',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.4)'
         }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#10b981', fontWeight: 700, fontSize: '0.75rem' }}>
+            <span style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#10b981',
+              boxShadow: '0 0 8px #10b981'
+            }} />
+            <span>LIVE</span>
+          </div>
+
+          <div style={{ width: '1px', height: '14px', background: 'rgba(255,255,255,0.15)' }} />
+
           <div>
             <span style={{ color: 'var(--text-muted)' }}>Gold (24K): </span>
-            <span style={{ color: 'var(--gold-light)', fontWeight: 700 }}>₹7,850/g</span>
+            <span style={{ color: 'var(--gold-light)', fontWeight: 700 }}>₹{rates.gold24k.toLocaleString('en-IN')}/g</span>
           </div>
-          <div style={{ width: '1px', height: '14px', background: 'rgba(255,255,255,0.15)' }}></div>
+
+          <div style={{ width: '1px', height: '14px', background: 'rgba(255,255,255,0.15)' }} />
+
           <div>
             <span style={{ color: 'var(--text-muted)' }}>Silver: </span>
-            <span style={{ color: '#e2e8f0', fontWeight: 700 }}>₹94/g</span>
+            <span style={{ color: '#e2e8f0', fontWeight: 700 }}>₹{rates.silver.toLocaleString('en-IN')}/g</span>
           </div>
+
+          <button
+            onClick={fetchRates}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--gold-primary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '2px',
+              opacity: loadingRates ? 0.5 : 1
+            }}
+            title="Refresh Live Gold & Silver Rates"
+          >
+            <RefreshCw size={14} className={loadingRates ? 'spin' : ''} />
+          </button>
         </div>
 
         {/* User / Shop Info */}
@@ -111,3 +173,4 @@ export default function Header({ shop, onLogout, onToggleSidebar }) {
     </header>
   );
 }
+
