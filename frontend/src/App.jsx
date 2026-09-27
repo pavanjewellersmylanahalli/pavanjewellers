@@ -9,8 +9,8 @@ export default function App() {
   const [token, setToken] = useState(null);
   const [view, setView] = useState('LOGIN'); // 'LOGIN' | 'REGISTER' | 'DASHBOARD'
 
-  // Dynamic API Base URL (Uses current domain or Vite proxy in dev)
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+  // Dynamic API Base URL (Uses Render URL in production, Vite proxy in dev)
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
 
   // Load saved session on mount
   useEffect(() => {
