@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 
 import GirviReceipt from './GirviReceipt';
+import GirviPassbookModal from './GirviPassbookModal';
 
 // Helper function to convert Indian Currency numbers to Words
 function numberToWordsINR(num) {
@@ -30,6 +31,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [selectedGirviForPrint, setSelectedGirviForPrint] = useState(null);
+  const [selectedGirviForPassbook, setSelectedGirviForPassbook] = useState(null);
 
   // Real Girvi items stored in LocalStorage for this shop
   const storageKey = `pavan_girvis_${shop?.id || shop?.login_mobile || 'default'}`;
@@ -411,6 +413,22 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
           body: JSON.stringify({ shopId: shop.id, girvi: updatedRecord })
         }).catch(() => {});
       }
+    }
+  };
+
+  const handleUpdateGirvi = (updatedRecord) => {
+    if (!updatedRecord || !updatedRecord.id) return;
+    setGirvis(prev => prev.map(item => item.id === updatedRecord.id ? updatedRecord : item));
+    setSelectedGirviForPassbook(updatedRecord);
+
+    // Sync updated record to Supabase DB
+    if (shop?.id) {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
+      fetch(`${apiBaseUrl}/api/girvis`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shopId: shop.id, girvi: updatedRecord })
+      }).catch(() => {});
     }
   };
 
@@ -1503,6 +1521,15 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                         </td>
                         <td style={{ padding: '14px', textAlign: 'right' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+                            <button
+                              className="btn-gold"
+                              style={{ padding: '4px 10px', fontSize: '0.75rem', minHeight: '32px' }}
+                              onClick={() => setSelectedGirviForPassbook(g)}
+                              title="Open Pledge Transaction Passbook"
+                            >
+                              <BookOpen size={13} />
+                              <span>Book</span>
+                            </button>
                             {g.status === 'ACTIVE' && (
                               <button
                                 className="btn-outline"
@@ -1583,24 +1610,32 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                         <div style={{ fontSize: '1.28rem', fontWeight: 900, color: '#34d399' }}>₹{Number(g.loanAmount).toLocaleString('en-IN')}</div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        <button
+                          className="btn-gold"
+                          style={{ padding: '6px 12px', fontSize: '0.78rem', minHeight: '36px' }}
+                          onClick={() => setSelectedGirviForPassbook(g)}
+                          title="Pledge Passbook Ledger"
+                        >
+                          <BookOpen size={14} />
+                          <span>Book</span>
+                        </button>
                         {g.status === 'ACTIVE' && (
                           <button
                             className="btn-outline"
-                            style={{ padding: '6px 12px', fontSize: '0.78rem', minHeight: '36px', color: '#34d399', borderColor: 'rgba(16, 185, 129, 0.4)' }}
+                            style={{ padding: '6px 10px', fontSize: '0.78rem', minHeight: '36px', color: '#34d399', borderColor: 'rgba(16, 185, 129, 0.4)' }}
                             onClick={() => handleReleaseGirvi(g.id)}
                           >
                             Release
                           </button>
                         )}
                         <button
-                          className="btn-gold"
-                          style={{ padding: '6px 12px', fontSize: '0.78rem', minHeight: '36px' }}
+                          className="btn-outline"
+                          style={{ padding: '6px 10px', fontSize: '0.78rem', minHeight: '36px' }}
                           onClick={() => setSelectedGirviForPrint(g)}
                           title="Print Receipt"
                         >
-                          <Printer size={15} />
-                          <span>Print</span>
+                          <Printer size={14} />
                         </button>
                         <button
                           className="btn-outline"
@@ -1608,7 +1643,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                           onClick={() => handleDeleteGirvi(g.id)}
                           title="Delete"
                         >
-                          <Trash2 size={15} />
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </div>
@@ -1630,6 +1665,15 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
             </div>
           )}
         </div>
+      )}
+
+      {/* Interactive Girvi Passbook / Transaction History Ledger Modal */}
+      {selectedGirviForPassbook && (
+        <GirviPassbookModal
+          girvi={selectedGirviForPassbook}
+          onClose={() => setSelectedGirviForPassbook(null)}
+          onUpdateGirvi={handleUpdateGirvi}
+        />
       )}
 
       {/* Official Form 'F' Pawn Ticket Print Modal */}
