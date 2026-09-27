@@ -267,22 +267,38 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
 
   const handleReleaseGirvi = (id) => {
     if (window.confirm(`Are you sure you want to mark Girvi ${id} as RELEASED / SETTLED?`)) {
-      setGirvis(girvis.map(item => {
-        if (item.id === id) {
-          return {
-            ...item,
-            status: 'RELEASED',
-            releaseDate: new Date().toISOString().split('T')[0]
-          };
-        }
-        return item;
-      }));
+      const targetItem = girvis.find(item => item.id === id);
+      if (!targetItem) return;
+
+      const updatedRecord = {
+        ...targetItem,
+        status: 'RELEASED',
+        releaseDate: new Date().toISOString().split('T')[0]
+      };
+
+      setGirvis(girvis.map(item => item.id === id ? updatedRecord : item));
+
+      // Sync status update to Supabase DB
+      if (shop?.id) {
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
+        fetch(`${apiBaseUrl}/api/girvis`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shopId: shop.id, girvi: updatedRecord })
+        }).catch(() => {});
+      }
     }
   };
 
   const handleDeleteGirvi = (id) => {
-    if (window.confirm(`Delete record ${id} permanently?`)) {
+    if (window.confirm(`Delete Girvi entry ${id} permanently from local ledger & Supabase database?`)) {
       setGirvis(girvis.filter(item => item.id !== id));
+
+      // Async deletion from Supabase DB
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
+      fetch(`${apiBaseUrl}/api/girvis/${encodeURIComponent(id)}`, {
+        method: 'DELETE'
+      }).catch(err => console.error('Failed to delete from Supabase DB:', err));
     }
   };
 

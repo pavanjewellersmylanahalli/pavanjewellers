@@ -441,6 +441,30 @@ app.post('/api/girvis', async (req, res) => {
   }
 });
 
+// DELETE GIRVI RECORD FROM SUPABASE DB
+app.delete('/api/girvis/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (supabase && id) {
+      const { error } = await supabase
+        .from('girvis')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Supabase Delete Girvi Error:', error.message);
+        return res.status(400).json({ error: error.message });
+      }
+      console.log(`🗑️ Girvi record ${id} deleted from Supabase DB successfully.`);
+    }
+    return res.json({ success: true, message: `Girvi ${id} deleted successfully.` });
+  } catch (err) {
+    console.error('Delete Girvi API Error:', err);
+    return res.status(500).json({ error: 'Failed to delete record' });
+  }
+});
+
+
 
 // 6. LIVE GOLD & SILVER RATES (Fetched from Global Spot & Currency Markets)
 app.get('/api/metal-rates', async (req, res) => {
