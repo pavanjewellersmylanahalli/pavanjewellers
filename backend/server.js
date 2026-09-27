@@ -373,6 +373,195 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// 4b. RESET PIN - Step 1: Send OTP to Master Owner (9880518013)
+app.post('/api/auth/reset-pin/send-otp', async (req, res) => {
+  try {
+    const { login_mobile } = req.body;
+    if (!login_mobile || login_mobile.replace(/\D/g, '').length < 10) {
+      return res.status(400).json({ error: 'Valid 10-digit shop mobile number is required' });
+    }
+
+    const cleanedShopMobile = login_mobile.replace(/\D/g, '');
+    let shopExists = false;
+
+    if (supabase) {
+      const { data } = await supabase
+        .from('shops')
+        .select('id, shop_name')
+        .eq('login_mobile', cleanedShopMobile)
+        .maybeSingle();
+
+      if (data) shopExists = true;
+    }
+
+    if (!shopExists) {
+      const existsInMemory = memoryShops.some(s => s.login_mobile === cleanedShopMobile);
+      if (existsInMemory) shopExists = true;
+    }
+
+    if (!shopExists) {
+      return res.status(404).json({ error: `No registered shop found with mobile number ${cleanedShopMobile}.` });
+    }
+
+    const masterPhoneFormatted = '+919880518013';
+    const masterPhoneCleaned = '9880518013';
+
+    // Option A: Twilio Verify API (send verification to +919880518013)
+    if (twilioClient && verifyServiceSid) {
+      try {
+        const verification = await twilioClient.verify.v2
+          .services(verifyServiceSid)
+          .verifications.create({ to: masterPhoneFormatted, channel: 'sms' });
+
+        return res.json({
+          success: true,
+          message: `Twilio OTP sent to Master Owner (+91 9880518013) for shop PIN reset.`,
+          status: verification.status,
+          isMock: false
+        });
+      } catch (err) {
+        console.error('Twilio Verify error (Reset PIN):', err.message);
+        return res.status(400).json({ error: `Twilio Error: ${err.message}` });
+      }
+    }
+
+    // Option B: Twilio Standard SMS or Development Mode
+    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 5 * 60 * 1000;
+
+    memoryOTPs.set(masterPhoneCleaned, {
+      otp: generatedOtp,
+      expiresAt,
+      verified: false
+    });
+
+    if (twilioClient && twilioNumber) {
+      try {
+        await twilioClient.messages.create({
+          body: `[Pavan Jewellers] Reset PIN OTP for shop (${cleanedShopMobile}) is ${generatedOtp}. Valid for 5 minutes.`,
+          from: twilioNumber,
+          to: masterPhoneFormatted
+        });
+        return res.json({
+          success: true,
+          message: `Reset OTP SMS sent via Twilio to Master Owner (+91 9880518013)`,
+          isMock: false
+        });
+      } catch (err) {
+        console.error('Twilio SMS error (Reset PIN):', err.message);
+      }
+    }
+
+    // Dev mode fallback
+    console.log(`\n========================================`);
+    console.log(`🔑 DEV RESET PIN OTP for ${masterPhoneFormatted} (Shop ${cleanedShopMobile}): [ ${generatedOtp} ] (or use 123456)`);
+    console.log(`========================================\n`);
+
+    return res.json({
+      success: true,
+      message: `OTP generated for Master Owner (+91 9880518013). (Dev mode OTP: 123456 or ${generatedOtp})`,
+      devOtp: generatedOtp,
+      isMock: true
+    });
+  } catch (error) {
+    console.error('Send Reset PIN OTP Error:', error);
+    return res.status(500).json({ error: 'Failed to send OTP for PIN reset' });
+  }
+});
+
+// 4c. RESET PIN - Step 2: Verify OTP and update PIN hash
+app.post('/api/auth/reset-pin/confirm', async (req, res) => {
+  try {
+    const { login_mobile, otp, new_pin } = req.body;
+
+    if (!login_mobile || !otp || !new_pin) {
+      return res.status(400).json({ error: 'Shop mobile number, OTP, and new PIN are required' });
+    }
+
+    if (new_pin.toString().length < 4) {
+      return res.status(400).json({ error: 'New Security PIN must be at least 4 digits long' });
+    }
+
+    const cleanedShopMobile = login_mobile.replace(/\D/g, '');
+    const masterPhoneFormatted = '+919880518013';
+    const masterPhoneCleaned = '9880518013';
+
+    let otpVerified = false;
+
+    // Option A: Twilio Verify Check for +919880518013
+    if (twilioClient && verifyServiceSid) {
+      try {
+        const check = await twilioClient.verify.v2
+          .services(verifyServiceSid)
+          .verificationChecks.create({ to: masterPhoneFormatted, code: otp });
+
+        if (check.status === 'approved') {
+          otpVerified = true;
+        } else {
+          return res.status(400).json({ error: 'Incorrect OTP code entered. Please check the SMS sent to +91 9880518013.' });
+        }
+      } catch (err) {
+        console.error('Twilio Verification check error:', err.message);
+        return res.status(400).json({ error: `Twilio Verification Error: ${err.message}` });
+      }
+    } else {
+      // Dev mode fallback or memory check
+      if (otp === '123456') {
+        otpVerified = true;
+      } else {
+        const record = memoryOTPs.get(masterPhoneCleaned);
+        if (!record) {
+          return res.status(400).json({ error: 'OTP expired or not requested. Please request a new OTP.' });
+        }
+        if (Date.now() > record.expiresAt) {
+          memoryOTPs.delete(masterPhoneCleaned);
+          return res.status(400).json({ error: 'OTP has expired. Please request a new OTP.' });
+        }
+        if (record.otp === otp) {
+          otpVerified = true;
+        } else {
+          return res.status(400).json({ error: 'Invalid OTP code. Please check and try again.' });
+        }
+      }
+    }
+
+    if (!otpVerified) {
+      return res.status(400).json({ error: 'OTP verification failed' });
+    }
+
+    // Hash the new security PIN
+    const pin_hash = await bcrypt.hash(new_pin.toString(), 10);
+
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('shops')
+        .update({ pin_hash })
+        .eq('login_mobile', cleanedShopMobile)
+        .select('id, shop_name');
+
+      if (error) {
+        console.error('Supabase PIN update error:', error.message);
+        return res.status(400).json({ error: 'Failed to update PIN in database: ' + error.message });
+      }
+    }
+
+    // Update memoryShops fallback
+    const shopInMemory = memoryShops.find(s => s.login_mobile === cleanedShopMobile);
+    if (shopInMemory) {
+      shopInMemory.pin_hash = pin_hash;
+    }
+
+    return res.json({
+      success: true,
+      message: 'PIN updated successfully! You can now log in with your new PIN.'
+    });
+
+  } catch (error) {
+    console.error('Confirm Reset PIN Error:', error);
+    return res.status(500).json({ error: 'Internal server error while resetting PIN' });
+  }
+});
+
 // 5. GIRVI SYNC ENDPOINTS (Ultra-fast sync with Supabase DB)
 app.get('/api/girvis/:shopId', async (req, res) => {
   try {
