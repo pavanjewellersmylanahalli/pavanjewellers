@@ -874,35 +874,70 @@ input[type=number] {
   margin: 10px 0;
 }
 
-/* PRINT STYLES */
+/* PRINT STYLES - Optimized for A4 Landscape with Zero Header/Footer Waste */
 @media print {
-  body * {
-    visibility: hidden;
+  @page {
+    size: A4 landscape;
+    margin: 0 !important; /* Removes browser top/bottom headers, footers, timestamps & URLs */
   }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    overflow: visible !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
   .receipt-modal-backdrop,
   .receipt-modal-backdrop * {
-    visibility: visible;
+    visibility: visible !important;
   }
+
   .no-print {
     display: none !important;
   }
+
   .receipt-modal-backdrop {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: auto;
-    background: transparent;
-    padding: 0;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: #ffffff !important;
+    padding: 4mm 5mm !important;
+    box-sizing: border-box !important;
+    backdrop-filter: none !important;
   }
+
   .receipt-dual-wrapper {
-    box-shadow: none;
-    padding: 0;
-    max-width: 100%;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 3mm !important;
+    background: #ffffff !important;
   }
-  @page {
-    size: A4 landscape;
-    margin: 6mm;
+
+  .pawn-ticket {
+    flex: 1 !important;
+    min-width: 0 !important;
+    width: 48.5% !important;
+    box-sizing: border-box !important;
+    padding: 6px 8px !important;
+    border: 1.8px solid #000000 !important;
+  }
+
+  .ticket-tear-line {
+    width: 12px !important;
   }
 }
 
