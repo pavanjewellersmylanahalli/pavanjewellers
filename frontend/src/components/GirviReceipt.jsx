@@ -21,7 +21,7 @@ export default function GirviReceipt({ girvi, shop, onClose }) {
   const shopName = shop?.shop_name || 'PAVAN JEWELLERS';
   const shopMobile = shop?.login_mobile || shop?.reg_mobile || '9876543210';
   const shopAddress = shop?.address || 'Main Bazaar, Jewelers Market, Mylanahalli';
-  const initials = shopName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'PJB';
+  const initials = 'PJB';
 
   const grossNum = parseFloat(girvi.grossWt) || 0;
   const grossGms = Math.floor(grossNum);
