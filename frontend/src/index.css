@@ -874,7 +874,7 @@ input[type=number] {
   margin: 10px 0;
 }
 
-/* PRINT STYLES - Optimized for A4 Landscape with Zero Header/Footer Waste */
+/* PRINT STYLES - Full A4 Landscape Vertical & Horizontal Utilization */
 @media print {
   @page {
     size: A4 landscape;
@@ -885,7 +885,8 @@ input[type=number] {
     margin: 0 !important;
     padding: 0 !important;
     background: #ffffff !important;
-    overflow: visible !important;
+    height: 100% !important;
+    overflow: hidden !important;
   }
 
   body * {
@@ -910,7 +911,7 @@ input[type=number] {
     width: 100% !important;
     height: 100% !important;
     background: #ffffff !important;
-    padding: 4mm 5mm !important;
+    padding: 5mm 6mm !important;
     box-sizing: border-box !important;
     backdrop-filter: none !important;
   }
@@ -921,23 +922,59 @@ input[type=number] {
     margin: 0 auto !important;
     width: 100% !important;
     max-width: 100% !important;
+    height: 196mm !important; /* Fills full height of A4 Landscape */
     display: flex !important;
     flex-direction: row !important;
-    gap: 3mm !important;
+    gap: 4mm !important;
     background: #ffffff !important;
+    box-sizing: border-box !important;
   }
 
   .pawn-ticket {
     flex: 1 !important;
     min-width: 0 !important;
     width: 48.5% !important;
+    height: 100% !important; /* Stretches ticket to 100% of 196mm height */
     box-sizing: border-box !important;
-    padding: 6px 8px !important;
-    border: 1.8px solid #000000 !important;
+    padding: 10px 12px !important;
+    border: 2px solid #000000 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important; /* Stretches sections vertically */
   }
 
   .ticket-tear-line {
     width: 12px !important;
+  }
+
+  .photo-sub-box {
+    height: 110px !important;
+  }
+
+  .pawner-row {
+    padding: 5px 8px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .fin-val {
+    font-size: 1.35rem !important;
+  }
+
+  .pawn-articles-table th, .pawn-articles-table td {
+    padding: 5px 6px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .pawn-articles-table tbody tr {
+    height: 32px !important;
+  }
+
+  .sig-box-left, .sig-box-right {
+    min-height: 110px !important;
+  }
+
+  .sig-footer-line {
+    margin-top: 30px !important;
   }
 }
 
