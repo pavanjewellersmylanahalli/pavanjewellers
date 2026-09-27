@@ -77,7 +77,7 @@ export default function App() {
         )}
 
         {/* Main Content Area */}
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, paddingBottom: '46px' }}>
           {view === 'DASHBOARD' && shop ? (
             <Dashboard 
               shop={shop} 
@@ -106,14 +106,20 @@ export default function App() {
         </main>
       </div>
 
-      {/* Footer */}
+      {/* Fixed Footer */}
       <footer style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 40,
+        background: 'rgba(15, 5, 8, 0.94)',
+        backdropFilter: 'blur(10px)',
         textAlign: 'center',
-        padding: '16px',
-        borderTop: '1px solid rgba(229, 193, 88, 0.1)',
+        padding: '10px 16px',
+        borderTop: '1px solid rgba(229, 193, 88, 0.15)',
         color: 'var(--text-muted)',
-        fontSize: '0.82rem',
-        marginTop: 'auto'
+        fontSize: '0.78rem'
       }}>
         © 2026 Pavan Jewellers Girvi Management Portal. Built for Render (Backend) + Vercel (Frontend) + Supabase (Database).
       </footer>
