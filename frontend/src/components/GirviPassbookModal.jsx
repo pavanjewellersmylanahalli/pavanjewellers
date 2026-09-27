@@ -4,6 +4,7 @@ import {
   ArrowUpRight, Coins, Printer, Trash2, CheckCircle2, AlertCircle, Scale, User, Save
 } from 'lucide-react';
 import { formatDate } from '../utils/dateUtils';
+import CustomDatePicker from './CustomDatePicker';
 
 export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
   if (!girvi) return null;
@@ -286,14 +287,12 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
 
               {/* Date */}
               <div>
-                <label className="input-label" style={{ fontSize: '0.75rem' }}>Transaction Date</label>
-                <input
-                  type="date"
-                  className="custom-input"
+                <CustomDatePicker
+                  label="Transaction Date"
                   value={transDate}
-                  onChange={(e) => setTransDate(e.target.value)}
+                  onChange={(val) => setTransDate(val)}
                   required
-                  style={{ padding: '8px 10px', fontSize: '0.85rem', width: '100%', minHeight: '40px' }}
+                  style={{ minHeight: '40px', fontSize: '0.85rem' }}
                 />
               </div>
 

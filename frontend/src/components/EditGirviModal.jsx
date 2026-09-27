@@ -3,6 +3,7 @@ import {
   X, Save, Edit3, Camera, Upload, User, Coins, Scale, DollarSign, Calendar
 } from 'lucide-react';
 import { calculateDueDate, numberToWordsINR, toIsoDate } from '../utils/dateUtils';
+import CustomDatePicker from './CustomDatePicker';
 
 export default function EditGirviModal({ girvi, onClose, onSave }) {
   if (!girvi) return null;
@@ -211,30 +212,20 @@ export default function EditGirviModal({ girvi, onClose, onSave }) {
               </div>
 
               {/* Pledge Date */}
-              <div className="input-group">
-                <label className="input-label">Pledge Date *</label>
-                <input
-                  type="date"
-                  className="custom-input"
-                  value={pledgeDate}
-                  onChange={(e) => handlePledgeDateChange(e.target.value)}
-                  required
-                  style={{ paddingLeft: '14px', background: '#120407' }}
-                />
-              </div>
+              <CustomDatePicker
+                label="Pledge Date *"
+                value={pledgeDate}
+                onChange={(val) => handlePledgeDateChange(val)}
+                required
+              />
 
               {/* Due Date */}
-              <div className="input-group">
-                <label className="input-label">Due Date * (Auto 1Yr + 1Mo)</label>
-                <input
-                  type="date"
-                  className="custom-input"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  required
-                  style={{ paddingLeft: '14px', background: '#120407' }}
-                />
-              </div>
+              <CustomDatePicker
+                label="Due Date * (Auto 1Yr + 1Mo)"
+                value={dueDate}
+                onChange={(val) => setDueDate(val)}
+                required
+              />
 
               {/* Customer Name */}
               <div className="input-group">

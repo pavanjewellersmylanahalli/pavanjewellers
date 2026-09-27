@@ -9,6 +9,7 @@ import {
 import GirviReceipt from './GirviReceipt';
 import GirviPassbookModal from './GirviPassbookModal';
 import EditGirviModal from './EditGirviModal';
+import CustomDatePicker from './CustomDatePicker';
 import { formatDate, calculateDueDate } from '../utils/dateUtils';
 
 // Helper function to convert Indian Currency numbers to Words
@@ -619,30 +620,20 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                 </div>
 
                 {/* Pledge Date */}
-                <div className="input-group">
-                  <label className="input-label">Pledge Date *</label>
-                  <input
-                    type="date"
-                    className="custom-input"
-                    value={pledgeDate}
-                    onChange={(e) => handlePledgeDateChange(e.target.value)}
-                    required
-                    style={{ paddingLeft: '16px', background: '#120407' }}
-                  />
-                </div>
+                <CustomDatePicker
+                  label="Pledge Date *"
+                  value={pledgeDate}
+                  onChange={(val) => handlePledgeDateChange(val)}
+                  required
+                />
 
                 {/* Due Date */}
-                <div className="input-group">
-                  <label className="input-label">Due Date * (Auto 1Yr + 1Mo)</label>
-                  <input
-                    type="date"
-                    className="custom-input"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    required
-                    style={{ paddingLeft: '16px', background: '#120407' }}
-                  />
-                </div>
+                <CustomDatePicker
+                  label="Due Date * (Auto 1Yr + 1Mo)"
+                  value={dueDate}
+                  onChange={(val) => setDueDate(val)}
+                  required
+                />
 
                 {/* Customer Name */}
                 <div className="input-group">
