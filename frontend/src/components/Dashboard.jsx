@@ -75,14 +75,21 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
   }, [checkedGirviIds, auditStorageKey]);
 
   const toggleCheckGirvi = (id) => {
-    setCheckedGirviIds(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
+    if (!id) return;
+    const strId = String(id);
+    setCheckedGirviIds(prev => {
+      const arr = Array.isArray(prev) ? prev : [];
+      return arr.includes(strId) ? arr.filter(item => item !== strId) : [...arr, strId];
+    });
   };
 
   const markAllAudit = (itemsToMark) => {
-    const idsToMark = itemsToMark.map(i => i.id);
-    setCheckedGirviIds(prev => Array.from(new Set([...prev, ...idsToMark])));
+    if (!Array.isArray(itemsToMark)) return;
+    const idsToMark = itemsToMark.map(i => String(i.id)).filter(Boolean);
+    setCheckedGirviIds(prev => {
+      const arr = Array.isArray(prev) ? prev : [];
+      return Array.from(new Set([...arr, ...idsToMark]));
+    });
   };
 
   const resetAuditSession = () => {
@@ -298,12 +305,12 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
 
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase();
-      items = items.filter(i => 
-        i.customerName.toLowerCase().includes(q) ||
-        i.id.toLowerCase().includes(q) ||
-        i.mobile.includes(q) ||
-        (i.articleName && i.articleName.toLowerCase().includes(q))
-      );
+      items = items.filter(i => i && (
+        (i.customerName && String(i.customerName).toLowerCase().includes(q)) ||
+        (i.id && String(i.id).toLowerCase().includes(q)) ||
+        (i.mobile && String(i.mobile).includes(q)) ||
+        (i.articleName && String(i.articleName).toLowerCase().includes(q))
+      ));
     }
 
     return items;
@@ -965,26 +972,28 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
       {/* ================= OPTION 6: GIRVI STOCK CHECK (PHYSICAL VAULT AUDIT) ================= */}
       {activeTab === 'STOCK_CHECK' && (() => {
         // Filter active vault items by metal tab
-        let auditBaseItems = activeGirvis;
+        const safeGirvis = Array.isArray(activeGirvis) ? activeGirvis : [];
+        let auditBaseItems = safeGirvis;
         if (auditMetalFilter === 'Gold') {
-          auditBaseItems = activeGirvis.filter(i => i.metal === 'Gold');
+          auditBaseItems = safeGirvis.filter(i => i && i.metal === 'Gold');
         } else if (auditMetalFilter === 'Silver') {
-          auditBaseItems = activeGirvis.filter(i => i.metal === 'Silver');
+          auditBaseItems = safeGirvis.filter(i => i && i.metal === 'Silver');
         }
 
-        // Apply Search filter
+        // Apply Search filter safely
         if (auditSearch.trim()) {
           const q = auditSearch.toLowerCase();
-          auditBaseItems = auditBaseItems.filter(i =>
-            i.id.toLowerCase().includes(q) ||
-            i.customerName.toLowerCase().includes(q) ||
-            i.mobile.includes(q) ||
-            (i.articleName && i.articleName.toLowerCase().includes(q))
-          );
+          auditBaseItems = auditBaseItems.filter(i => i && (
+            (i.id && String(i.id).toLowerCase().includes(q)) ||
+            (i.customerName && String(i.customerName).toLowerCase().includes(q)) ||
+            (i.mobile && String(i.mobile).includes(q)) ||
+            (i.articleName && String(i.articleName).toLowerCase().includes(q))
+          ));
         }
 
-        const uncheckedList = auditBaseItems.filter(i => !checkedGirviIds.includes(i.id));
-        const checkedList = auditBaseItems.filter(i => checkedGirviIds.includes(i.id));
+        const safeCheckedIds = Array.isArray(checkedGirviIds) ? checkedGirviIds.map(String) : [];
+        const uncheckedList = auditBaseItems.filter(i => i && !safeCheckedIds.includes(String(i.id)));
+        const checkedList = auditBaseItems.filter(i => i && safeCheckedIds.includes(String(i.id)));
 
         const totalAuditCount = auditBaseItems.length;
         const checkedCount = checkedList.length;
@@ -1333,7 +1342,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
       )}
 
       {/* ================= MAIN LEDGER TABLE (TOTAL, GOLD, SILVER, RELEASE) ================= */}
-      {activeTab !== 'NEW_GIRVI' && (
+      {activeTab !== 'NEW_GIRVI' && activeTab !== 'STOCK_CHECK' && (
         <div className="glass-card" style={{ padding: '24px' }}>
           {/* Controls Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px', marginBottom: '20px' }}>
