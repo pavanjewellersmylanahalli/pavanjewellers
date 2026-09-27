@@ -85,14 +85,18 @@ export default function GirviReceipt({ girvi, shop, onClose }) {
             {girvi.customerPhoto ? (
               <img src={girvi.customerPhoto} alt="Customer" className="photo-img" />
             ) : (
-              <span className="photo-lbl">Customer Photo</span>
+              <div className="photo-placeholder">
+                <span className="photo-lbl">Customer<br/>Photo</span>
+              </div>
             )}
           </div>
           <div className="photo-sub-box">
             {girvi.itemPhoto ? (
               <img src={girvi.itemPhoto} alt="Item" className="photo-img" />
             ) : (
-              <span className="photo-lbl">Item Photo</span>
+              <div className="photo-placeholder">
+                <span className="photo-lbl">Item<br/>Photo</span>
+              </div>
             )}
           </div>
         </div>

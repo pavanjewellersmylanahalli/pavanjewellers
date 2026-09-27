@@ -676,8 +676,9 @@ input[type=number] {
 }
 
 .photo-container-box {
-  width: 140px;
+  width: 150px;
   display: flex;
+  align-self: stretch;
 }
 
 .photo-sub-box {
@@ -686,13 +687,22 @@ input[type=number] {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 92px;
+  align-self: stretch;
   background: #fafafa;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .photo-sub-box:last-child {
   border-right: none;
+}
+
+.photo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4px;
 }
 
 .photo-img {
@@ -702,9 +712,11 @@ input[type=number] {
 }
 
 .photo-lbl {
-  font-size: 0.62rem;
+  font-size: 0.65rem;
+  font-weight: 700;
   color: #3b82f6;
   text-align: center;
+  line-height: 1.2;
 }
 
 /* Financial Box (Stacked 2-Line Format) */
@@ -1054,7 +1066,9 @@ input[type=number] {
   }
 
   .pawner-grid-container {
-    margin-bottom: 6px !important;
+    display: flex !important;
+    align-items: stretch !important;
+    margin-bottom: -1.5px !important;
   }
 
   .pawner-row {
@@ -1067,15 +1081,19 @@ input[type=number] {
   }
 
   .photo-container-box {
-    width: 135px !important;
+    width: 140px !important;
+    display: flex !important;
+    align-self: stretch !important;
   }
 
   .photo-sub-box {
-    height: 88px !important;
+    height: auto !important;
+    align-self: stretch !important;
   }
 
   .photo-lbl {
     font-size: 0.62rem !important;
+    line-height: 1.15 !important;
   }
 
   .financial-grid-box {
