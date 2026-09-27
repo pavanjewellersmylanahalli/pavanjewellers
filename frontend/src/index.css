@@ -356,6 +356,46 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Sidebar Styles */
+.sidebar-panel {
+  width: 260px;
+  background: rgba(18, 5, 12, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(229, 193, 88, 0.15);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.sidebar-item:hover {
+  background: rgba(229, 193, 88, 0.1) !important;
+  color: var(--gold-light) !important;
+}
+
+@media (max-width: 1023px) {
+  .sidebar-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
+    transform: translateX(-100%);
+  }
+
+  .sidebar-panel.open {
+    transform: translateX(0);
+  }
+}
+
+@media (min-width: 1024px) {
+  .sidebar-close-btn {
+    display: none;
+  }
+}
+
 /* ================= RESPONSIVE MEDIA QUERIES ================= */
 
 /* Small Mobile Screens (< 480px) */

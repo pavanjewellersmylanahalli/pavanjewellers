@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
+import Sidebar from './components/Sidebar';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
@@ -8,6 +9,10 @@ export default function App() {
   const [shop, setShop] = useState(null);
   const [token, setToken] = useState(null);
   const [view, setView] = useState('LOGIN'); // 'LOGIN' | 'REGISTER' | 'DASHBOARD'
+
+  // Sidebar & Portal Tab States
+  const [activeTab, setActiveTab] = useState('TOTAL_LEDGER');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Dynamic API Base URL (Uses Render URL in production, Vite proxy in dev)
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
@@ -53,31 +58,53 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Header shop={shop} onLogout={handleLogout} />
+      <Header 
+        shop={shop} 
+        onLogout={handleLogout} 
+        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
+      />
 
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {view === 'DASHBOARD' && shop ? (
-          <Dashboard shop={shop} />
-        ) : (
-          <div className="auth-container">
-            {view === 'LOGIN' && (
-              <Login
-                onLoginSuccess={handleLoginSuccess}
-                onSwitchToRegister={() => setView('REGISTER')}
-                apiBaseUrl={apiBaseUrl}
-              />
-            )}
-
-            {view === 'REGISTER' && (
-              <Register
-                onRegisterSuccess={handleRegisterSuccess}
-                onSwitchToLogin={() => setView('LOGIN')}
-                apiBaseUrl={apiBaseUrl}
-              />
-            )}
-          </div>
+      <div style={{ flex: 1, display: 'flex', position: 'relative' }}>
+        {/* Sidebar Navigation */}
+        {view === 'DASHBOARD' && shop && (
+          <Sidebar 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            isOpen={isSidebarOpen} 
+            onClose={() => setIsSidebarOpen(false)} 
+            shop={shop} 
+          />
         )}
-      </main>
+
+        {/* Main Content Area */}
+        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          {view === 'DASHBOARD' && shop ? (
+            <Dashboard 
+              shop={shop} 
+              activeTab={activeTab} 
+              setActiveTab={setActiveTab} 
+            />
+          ) : (
+            <div className="auth-container">
+              {view === 'LOGIN' && (
+                <Login
+                  onLoginSuccess={handleLoginSuccess}
+                  onSwitchToRegister={() => setView('REGISTER')}
+                  apiBaseUrl={apiBaseUrl}
+                />
+              )}
+
+              {view === 'REGISTER' && (
+                <Register
+                  onRegisterSuccess={handleRegisterSuccess}
+                  onSwitchToLogin={() => setView('LOGIN')}
+                  apiBaseUrl={apiBaseUrl}
+                />
+              )}
+            </div>
+          )}
+        </main>
+      </div>
 
       {/* Footer */}
       <footer style={{
