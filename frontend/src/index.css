@@ -453,14 +453,26 @@ input[type=number] {
   }
 }
 
+.ledger-mobile-view {
+  display: none;
+}
+
 /* Tablet & Mobile (< 768px) */
 @media (max-width: 768px) {
-  .header-ticker {
-    display: none;
+  .ledger-desktop-view {
+    display: none !important;
+  }
+
+  .ledger-mobile-view {
+    display: block !important;
   }
 
   .dashboard-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr !important;
+  }
+
+  .header-ticker {
+    display: none;
   }
 }
 

@@ -1056,86 +1056,168 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
             </div>
           </div>
 
-          {/* Table */}
+          {/* Table (Desktop View) & Cards (Mobile View) */}
           {filteredGirvis.length > 0 ? (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid rgba(229, 193, 88, 0.2)', color: 'var(--gold-primary)', height: '40px' }}>
-                    <th style={{ padding: '12px 14px' }}>Pledge ID</th>
-                    <th style={{ padding: '12px 14px' }}>Customer Name</th>
-                    <th style={{ padding: '12px 14px' }}>Article & Wt</th>
-                    <th style={{ padding: '12px 14px' }}>Net Wt</th>
-                    <th style={{ padding: '12px 14px' }}>Loan Amount</th>
-                    <th style={{ padding: '12px 14px' }}>Loan in Words</th>
-                    <th style={{ padding: '12px 14px' }}>Status</th>
-                    <th style={{ padding: '12px 14px', textAlign: 'right' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredGirvis.map((g) => (
-                    <tr key={g.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', transition: 'background 0.2s ease' }} className="table-row-hover">
-                      <td style={{ padding: '14px', fontWeight: 700, color: 'var(--gold-light)' }}>
-                        <div>{g.id}</div>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{g.pledgeDate || g.date}</div>
-                      </td>
-                      <td style={{ padding: '14px' }}>
-                        <div style={{ fontWeight: 600, color: '#ffffff' }}>
-                          {g.customerName} {g.relationType && g.relationName ? `(${g.relationType} ${g.relationName})` : ''}
-                        </div>
-                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>+91 {g.mobile}</div>
-                      </td>
-                      <td style={{ padding: '14px', color: '#e2e8f0' }}>
-                        <div>{g.articleName || g.itemDescription}</div>
-                        <span className="badge-gold" style={{ fontSize: '0.68rem' }}>{g.metal} ({g.quantity || 1} Pcs)</span>
-                      </td>
-                      <td style={{ padding: '14px', fontWeight: 600, color: 'var(--gold-primary)' }}>{g.weight}</td>
-                      <td style={{ padding: '14px', fontWeight: 700, color: '#ffffff' }}>₹{Number(g.loanAmount).toLocaleString('en-IN')}</td>
-                      <td style={{ padding: '14px', color: '#6ee7b7', fontSize: '0.78rem', maxWidth: '180px' }}>
-                        {g.loanAmountInWords || numberToWordsINR(g.loanAmount)}
-                      </td>
-                      <td style={{ padding: '14px' }}>
-                        {g.status === 'ACTIVE' ? (
-                          <span className="badge-gold">ACTIVE</span>
-                        ) : (
-                          <span className="badge-success">RELEASED</span>
-                        )}
-                      </td>
-                      <td style={{ padding: '14px', textAlign: 'right' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
-                          {g.status === 'ACTIVE' && (
+            <>
+              {/* Desktop Table View */}
+              <div className="ledger-desktop-view" style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid rgba(229, 193, 88, 0.2)', color: 'var(--gold-primary)', height: '40px' }}>
+                      <th style={{ padding: '12px 14px' }}>Pledge ID</th>
+                      <th style={{ padding: '12px 14px' }}>Customer Name</th>
+                      <th style={{ padding: '12px 14px' }}>Article & Wt</th>
+                      <th style={{ padding: '12px 14px' }}>Net Wt</th>
+                      <th style={{ padding: '12px 14px' }}>Loan Amount</th>
+                      <th style={{ padding: '12px 14px' }}>Loan in Words</th>
+                      <th style={{ padding: '12px 14px' }}>Status</th>
+                      <th style={{ padding: '12px 14px', textAlign: 'right' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredGirvis.map((g) => (
+                      <tr key={g.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', transition: 'background 0.2s ease' }} className="table-row-hover">
+                        <td style={{ padding: '14px', fontWeight: 700, color: 'var(--gold-light)' }}>
+                          <div>{g.id}</div>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{g.pledgeDate || g.date}</div>
+                        </td>
+                        <td style={{ padding: '14px' }}>
+                          <div style={{ fontWeight: 600, color: '#ffffff' }}>
+                            {g.customerName} {g.relationType && g.relationName ? `(${g.relationType} ${g.relationName})` : ''}
+                          </div>
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>+91 {g.mobile}</div>
+                        </td>
+                        <td style={{ padding: '14px', color: '#e2e8f0' }}>
+                          <div>{g.articleName || g.itemDescription}</div>
+                          <span className="badge-gold" style={{ fontSize: '0.68rem' }}>{g.metal} ({g.quantity || 1} Pcs)</span>
+                        </td>
+                        <td style={{ padding: '14px', fontWeight: 600, color: 'var(--gold-primary)' }}>{g.weight}</td>
+                        <td style={{ padding: '14px', fontWeight: 700, color: '#ffffff' }}>₹{Number(g.loanAmount).toLocaleString('en-IN')}</td>
+                        <td style={{ padding: '14px', color: '#6ee7b7', fontSize: '0.78rem', maxWidth: '180px' }}>
+                          {g.loanAmountInWords || numberToWordsINR(g.loanAmount)}
+                        </td>
+                        <td style={{ padding: '14px' }}>
+                          {g.status === 'ACTIVE' ? (
+                            <span className="badge-gold">ACTIVE</span>
+                          ) : (
+                            <span className="badge-success">RELEASED</span>
+                          )}
+                        </td>
+                        <td style={{ padding: '14px', textAlign: 'right' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+                            {g.status === 'ACTIVE' && (
+                              <button
+                                className="btn-outline"
+                                style={{ padding: '4px 10px', fontSize: '0.75rem', minHeight: '32px', color: '#34d399', borderColor: 'rgba(16, 185, 129, 0.4)' }}
+                                onClick={() => handleReleaseGirvi(g.id)}
+                                title="Release / Settle Loan"
+                              >
+                                Release
+                              </button>
+                            )}
                             <button
                               className="btn-outline"
-                              style={{ padding: '4px 10px', fontSize: '0.75rem', minHeight: '32px', color: '#34d399', borderColor: 'rgba(16, 185, 129, 0.4)' }}
-                              onClick={() => handleReleaseGirvi(g.id)}
-                              title="Release / Settle Loan"
+                              style={{ padding: '4px 8px', fontSize: '0.75rem', minHeight: '32px' }}
+                              onClick={() => setSelectedGirviForPrint(g)}
+                              title="Print Pawn Ticket (Form 'F')"
                             >
-                              Release
+                              <Printer size={13} />
                             </button>
-                          )}
+                            <button
+                              className="btn-outline"
+                              style={{ padding: '4px 8px', fontSize: '0.75rem', minHeight: '32px', color: '#fca5a5' }}
+                              onClick={() => handleDeleteGirvi(g.id)}
+                              title="Delete Entry"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card List View (Visible < 768px - No Horizontal Scrolling) */}
+              <div className="ledger-mobile-view">
+                {filteredGirvis.map((g) => (
+                  <div key={g.id} className="glass-card" style={{ padding: '16px', marginBottom: '14px', background: 'rgba(15, 5, 8, 0.92)', border: '1.5px solid rgba(229, 193, 88, 0.3)', borderRadius: '16px' }}>
+                    {/* Top Row: Pledge ID & Status */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', paddingBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                      <div>
+                        <span style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--gold-light)' }}>No. {g.id}</span>
+                        <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginLeft: '10px' }}>{g.pledgeDate || g.date}</span>
+                      </div>
+                      {g.status === 'ACTIVE' ? (
+                        <span className="badge-gold">ACTIVE</span>
+                      ) : (
+                        <span className="badge-success">RELEASED</span>
+                      )}
+                    </div>
+
+                    {/* Customer Info */}
+                    <div style={{ marginBottom: '10px' }}>
+                      <div style={{ fontSize: '0.98rem', fontWeight: 700, color: '#ffffff' }}>
+                        {g.customerName} {g.relationType && g.relationName ? `(${g.relationType} ${g.relationName})` : ''}
+                      </div>
+                      <div style={{ fontSize: '0.82rem', color: 'var(--text-gold)', marginTop: '2px' }}>
+                        📞 +91 {g.mobile}
+                      </div>
+                    </div>
+
+                    {/* Article & Net Weight Box */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(229, 193, 88, 0.08)', padding: '10px 14px', borderRadius: '10px', marginBottom: '12px', border: '1px solid rgba(229, 193, 88, 0.15)' }}>
+                      <div>
+                        <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#ffffff' }}>{g.articleName || g.itemDescription}</div>
+                        <span className="badge-gold" style={{ fontSize: '0.66rem', marginTop: '3px', display: 'inline-block' }}>{g.metal} ({g.quantity || 1} Pcs)</span>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Net Weight</div>
+                        <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--gold-primary)' }}>{g.weight}</div>
+                      </div>
+                    </div>
+
+                    {/* Footer: Loan Amount & Touch Actions */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', paddingTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Loan Sanctioned</div>
+                        <div style={{ fontSize: '1.28rem', fontWeight: 900, color: '#34d399' }}>₹{Number(g.loanAmount).toLocaleString('en-IN')}</div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {g.status === 'ACTIVE' && (
                           <button
                             className="btn-outline"
-                            style={{ padding: '4px 8px', fontSize: '0.75rem', minHeight: '32px' }}
-                            onClick={() => setSelectedGirviForPrint(g)}
-                            title="Print Pawn Ticket (Form 'F')"
+                            style={{ padding: '6px 12px', fontSize: '0.78rem', minHeight: '36px', color: '#34d399', borderColor: 'rgba(16, 185, 129, 0.4)' }}
+                            onClick={() => handleReleaseGirvi(g.id)}
                           >
-                            <Printer size={13} />
+                            Release
                           </button>
-                          <button
-                            className="btn-outline"
-                            style={{ padding: '4px 8px', fontSize: '0.75rem', minHeight: '32px', color: '#fca5a5' }}
-                            onClick={() => handleDeleteGirvi(g.id)}
-                            title="Delete Entry"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        )}
+                        <button
+                          className="btn-gold"
+                          style={{ padding: '6px 12px', fontSize: '0.78rem', minHeight: '36px' }}
+                          onClick={() => setSelectedGirviForPrint(g)}
+                          title="Print Receipt"
+                        >
+                          <Printer size={15} />
+                          <span>Print</span>
+                        </button>
+                        <button
+                          className="btn-outline"
+                          style={{ padding: '6px 10px', fontSize: '0.78rem', minHeight: '36px', color: '#fca5a5' }}
+                          onClick={() => handleDeleteGirvi(g.id)}
+                          title="Delete"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           ) : (
             <div style={{ textAlign: 'center', padding: '48px 16px', color: 'var(--text-muted)' }}>
               <BookOpen size={48} style={{ opacity: 0.3, marginBottom: '12px' }} />
