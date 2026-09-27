@@ -3,7 +3,7 @@ import {
   Building, Phone, MapPin, Plus, Search, Filter, ShieldCheck, 
   Coins, Scale, Award, ArrowUpRight, CheckCircle2, Clock, DollarSign, UserCheck,
   PackageCheck, BookOpen, CheckCircle, PlusCircle, AlertCircle, FileText, Trash2, Printer,
-  Camera, Upload, Calendar, User, RefreshCw, Pause, Play, RotateCcw, Save, FileText as DetailsIcon, Edit3
+  Camera, Upload, Calendar, User, RefreshCw, Pause, Play, RotateCcw, Save, FileText as DetailsIcon, Edit3, Download
 } from 'lucide-react';
 
 import GirviReceipt from './GirviReceipt';
@@ -11,6 +11,7 @@ import GirviPassbookModal from './GirviPassbookModal';
 import EditGirviModal from './EditGirviModal';
 import CustomDatePicker from './CustomDatePicker';
 import { formatDate, calculateDueDate } from '../utils/dateUtils';
+import { exportLedgerToCSV } from '../utils/exportUtils';
 
 // Helper function to convert Indian Currency numbers to Words
 function numberToWordsINR(num) {
@@ -1657,6 +1658,23 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
               >
                 <RefreshCw size={14} className={isSyncing ? 'spin' : ''} />
                 <span>{isSyncing ? 'Syncing...' : 'Sync DB'}</span>
+              </button>
+
+              {/* Export Ledger CSV Button */}
+              <button
+                className="btn-gold"
+                onClick={() => {
+                  const titleName = activeTab === 'GOLD_DASHBOARD' ? 'Gold_Mortgage_Ledger' :
+                                   activeTab === 'SILVER_DASHBOARD' ? 'Silver_Mortgage_Ledger' :
+                                   activeTab === 'RELEASE_LEDGER' ? 'Released_Girvi_Loan_Ledger' :
+                                   'Master_Girvi_Ledger';
+                  exportLedgerToCSV(filteredGirvis, `${shop?.shop_name || 'Pavan_Jewellers'}_${titleName}`);
+                }}
+                style={{ padding: '6px 14px', fontSize: '0.82rem', minHeight: '38px' }}
+                title="Download structured Excel / CSV ledger file"
+              >
+                <Download size={15} />
+                <span>Export Ledger (CSV)</span>
               </button>
 
               {/* Status Filter */}
