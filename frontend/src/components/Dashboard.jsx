@@ -294,11 +294,13 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     let items = girvis;
 
     if (activeTab === 'GOLD_DASHBOARD') {
-      items = items.filter(i => i.metal === 'Gold');
+      items = items.filter(i => i.metal === 'Gold' && i.status === 'ACTIVE');
     } else if (activeTab === 'SILVER_DASHBOARD') {
-      items = items.filter(i => i.metal === 'Silver');
+      items = items.filter(i => i.metal === 'Silver' && i.status === 'ACTIVE');
     } else if (activeTab === 'RELEASE_LEDGER') {
       items = items.filter(i => i.status === 'RELEASED');
+    } else {
+      items = items.filter(i => i.status === 'ACTIVE');
     }
 
     if (filterStatus !== 'ALL' && activeTab !== 'RELEASE_LEDGER') {
@@ -400,6 +402,31 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
         ...targetItem,
         status: 'RELEASED',
         releaseDate: new Date().toISOString().split('T')[0]
+      };
+
+      setGirvis(girvis.map(item => item.id === id ? updatedRecord : item));
+
+      // Sync status update to Supabase DB
+      if (shop?.id) {
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
+        fetch(`${apiBaseUrl}/api/girvis`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shopId: shop.id, girvi: updatedRecord })
+        }).catch(() => {});
+      }
+    }
+  };
+
+  const handleUndoReleaseGirvi = (id) => {
+    if (window.confirm(`Undo release for Girvi No. ${id}? This will reactivate the mortgage and move it back to Active / Total Ledger.`)) {
+      const targetItem = girvis.find(item => item.id === id);
+      if (!targetItem) return;
+
+      const updatedRecord = {
+        ...targetItem,
+        status: 'ACTIVE',
+        releaseDate: null
       };
 
       setGirvis(girvis.map(item => item.id === id ? updatedRecord : item));
@@ -1530,7 +1557,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                               <BookOpen size={13} />
                               <span>Book</span>
                             </button>
-                            {g.status === 'ACTIVE' && (
+                            {g.status === 'ACTIVE' ? (
                               <button
                                 className="btn-outline"
                                 style={{ padding: '4px 10px', fontSize: '0.75rem', minHeight: '32px', color: '#34d399', borderColor: 'rgba(16, 185, 129, 0.4)' }}
@@ -1538,6 +1565,16 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                                 title="Release / Settle Loan"
                               >
                                 Release
+                              </button>
+                            ) : (
+                              <button
+                                className="btn-outline"
+                                style={{ padding: '4px 10px', fontSize: '0.75rem', minHeight: '32px', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.4)' }}
+                                onClick={() => handleUndoReleaseGirvi(g.id)}
+                                title="Undo Release & Move Back to Active Ledger"
+                              >
+                                <RotateCcw size={13} />
+                                <span>Undo Release</span>
                               </button>
                             )}
                             <button
@@ -1620,13 +1657,23 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                           <BookOpen size={14} />
                           <span>Book</span>
                         </button>
-                        {g.status === 'ACTIVE' && (
+                        {g.status === 'ACTIVE' ? (
                           <button
                             className="btn-outline"
                             style={{ padding: '6px 10px', fontSize: '0.78rem', minHeight: '36px', color: '#34d399', borderColor: 'rgba(16, 185, 129, 0.4)' }}
                             onClick={() => handleReleaseGirvi(g.id)}
                           >
                             Release
+                          </button>
+                        ) : (
+                          <button
+                            className="btn-outline"
+                            style={{ padding: '6px 10px', fontSize: '0.78rem', minHeight: '36px', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.4)' }}
+                            onClick={() => handleUndoReleaseGirvi(g.id)}
+                            title="Undo release and return to active ledger"
+                          >
+                            <RotateCcw size={14} />
+                            <span>Undo Release</span>
                           </button>
                         )}
                         <button
