@@ -49,6 +49,17 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     }
   }, [girvis, storageKey]);
 
+  // Prevent mouse wheel scrolling from accidentally changing number inputs
+  useEffect(() => {
+    const handleWheel = () => {
+      if (document.activeElement && document.activeElement.type === 'number') {
+        document.activeElement.blur();
+      }
+    };
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, []);
+
   // Form states for New Girvi Entry
   const todayStr = new Date().toISOString().split('T')[0];
   const nextYearStr = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
