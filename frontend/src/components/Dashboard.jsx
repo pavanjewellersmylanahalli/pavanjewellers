@@ -189,6 +189,31 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const [monthlyIncome, setMonthlyIncome] = useState('');
   const [address, setAddress] = useState('');
   const [customerPhoto, setCustomerPhoto] = useState(null);
+  const [isRegularCustomerFound, setIsRegularCustomerFound] = useState(false);
+
+  // Auto-fill regular customer details when 10-digit mobile number is entered
+  const handleMobileChange = (val) => {
+    const cleanVal = val.replace(/\D/g, '').slice(0, 10);
+    setMobile(cleanVal);
+
+    if (cleanVal.length === 10) {
+      const existing = girvis.find(g => g.mobile === cleanVal && g.customerName);
+      if (existing) {
+        if (existing.customerName) setCustomerName(existing.customerName);
+        if (existing.relationType) setRelationType(existing.relationType);
+        if (existing.relationName) setRelationName(existing.relationName);
+        if (existing.address) setAddress(existing.address);
+        if (existing.monthlyIncome) setMonthlyIncome(existing.monthlyIncome);
+        if (existing.customerPhoto) setCustomerPhoto(existing.customerPhoto);
+
+        setIsRegularCustomerFound(true);
+      } else {
+        setIsRegularCustomerFound(false);
+      }
+    } else {
+      setIsRegularCustomerFound(false);
+    }
+  };
 
   // Article Details
   const [metal, setMetal] = useState('Gold');
@@ -342,6 +367,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     setMonthlyIncome('');
     setAddress('');
     setCustomerPhoto(null);
+    setIsRegularCustomerFound(false);
     setArticleName('');
     setGrossWt('');
     setLessWt('0');
@@ -435,6 +461,26 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                 <User size={18} /> Section 1: Pledge & Customer Details
               </h3>
 
+              {/* Regular Customer Auto-fill Banner */}
+              {isRegularCustomerFound && (
+                <div style={{
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  border: '1.5px solid rgba(16, 185, 129, 0.4)',
+                  borderRadius: '12px',
+                  padding: '10px 14px',
+                  marginBottom: '18px',
+                  color: '#6ee7b7',
+                  fontSize: '0.86rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}>
+                  <CheckCircle2 size={20} color="#34d399" />
+                  <span>✨ Regular Customer Found! Details (Name, Relation, Address/Village, Income & Photo) auto-filled from previous records.</span>
+                </div>
+              )}
+
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
                 {/* Pledge Number */}
                 <div className="input-group">
@@ -447,6 +493,24 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                     onChange={(e) => setPledgeNumber(e.target.value)}
                     required
                     style={{ paddingLeft: '16px' }}
+                  />
+                </div>
+
+                {/* Mobile Number (Moved to top for instant auto-fill) */}
+                <div className="input-group">
+                  <div className="input-label">
+                    <span>Mobile Number *</span>
+                    {isRegularCustomerFound && <span className="badge-success">REGULAR CUSTOMER</span>}
+                  </div>
+                  <input
+                    type="tel"
+                    className="custom-input"
+                    placeholder="10-digit Mobile Number"
+                    maxLength={10}
+                    value={mobile}
+                    onChange={(e) => handleMobileChange(e.target.value)}
+                    required
+                    style={{ paddingLeft: '16px', borderColor: isRegularCustomerFound ? '#34d399' : undefined }}
                   />
                 </div>
 
@@ -515,21 +579,6 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                     placeholder="Father / Husband / Relative Name"
                     value={relationName}
                     onChange={(e) => setRelationName(e.target.value)}
-                    style={{ paddingLeft: '16px' }}
-                  />
-                </div>
-
-                {/* Mobile Number */}
-                <div className="input-group">
-                  <label className="input-label">Mobile Number *</label>
-                  <input
-                    type="tel"
-                    className="custom-input"
-                    placeholder="10-digit Mobile Number"
-                    maxLength={10}
-                    value={mobile}
-                    onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
-                    required
                     style={{ paddingLeft: '16px' }}
                   />
                 </div>
