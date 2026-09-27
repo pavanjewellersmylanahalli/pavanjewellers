@@ -30,6 +30,56 @@ function numberToWordsINR(num) {
   return inWords(n) + ' Rupees Only';
 }
 
+// Helper functions for Pledge Number Box Series Range matching (e.g. B2000 to B2800)
+function parsePledgeId(str) {
+  if (!str) return { prefix: '', num: null };
+  const s = String(str).trim();
+  const match = s.match(/^([A-Za-z\s\-_]*?)(\d+)$/);
+  if (match) {
+    return {
+      prefix: match[1].toUpperCase(),
+      num: parseInt(match[2], 10)
+    };
+  }
+  const numOnly = parseInt(s.replace(/\D/g, ''), 10);
+  return {
+    prefix: '',
+    num: isNaN(numOnly) ? null : numOnly
+  };
+}
+
+function isPledgeIdInRange(itemId, fromStr, toStr) {
+  if (!itemId) return false;
+  if (!fromStr && !toStr) return true;
+
+  const itemParsed = parsePledgeId(itemId);
+  const fromParsed = fromStr ? parsePledgeId(fromStr) : null;
+  const toParsed = toStr ? parsePledgeId(toStr) : null;
+
+  if (itemParsed.num === null) {
+    const itemUpper = String(itemId).toUpperCase();
+    if (fromStr && itemUpper < String(fromStr).toUpperCase()) return false;
+    if (toStr && itemUpper > String(toStr).toUpperCase()) return false;
+    return true;
+  }
+
+  if (fromParsed && fromParsed.prefix && itemParsed.prefix && fromParsed.prefix !== itemParsed.prefix) {
+    return false;
+  }
+  if (toParsed && toParsed.prefix && itemParsed.prefix && toParsed.prefix !== itemParsed.prefix) {
+    return false;
+  }
+
+  if (fromParsed && fromParsed.num !== null) {
+    if (itemParsed.num < fromParsed.num) return false;
+  }
+  if (toParsed && toParsed.num !== null) {
+    if (itemParsed.num > toParsed.num) return false;
+  }
+
+  return true;
+}
+
 export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
@@ -70,6 +120,8 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
   });
 
   const [auditMetalFilter, setAuditMetalFilter] = useState('Gold');
+  const [auditRangeFrom, setAuditRangeFrom] = useState('');
+  const [auditRangeTo, setAuditRangeTo] = useState('');
   const [auditSearch, setAuditSearch] = useState('');
 
   useEffect(() => {
@@ -1068,6 +1120,11 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
           auditBaseItems = safeGirvis.filter(i => i && i.metal === 'Silver');
         }
 
+        // Filter by Vault Box / Series Range (e.g., B2000 to B2800)
+        if (auditRangeFrom.trim() || auditRangeTo.trim()) {
+          auditBaseItems = auditBaseItems.filter(i => i && isPledgeIdInRange(i.id, auditRangeFrom, auditRangeTo));
+        }
+
         // Apply Search filter safely
         if (auditSearch.trim()) {
           const q = auditSearch.toLowerCase();
@@ -1249,6 +1306,81 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                     background: 'linear-gradient(90deg, #10b981 0%, #34d399 50%, #e5c158 100%)',
                     transition: 'width 0.4s ease'
                   }} />
+                </div>
+              </div>
+
+              {/* Vault Box Series Range Audit Filter */}
+              <div style={{
+                background: 'rgba(10, 3, 6, 0.6)',
+                border: '1.5px solid rgba(229, 193, 88, 0.35)',
+                borderRadius: '16px',
+                padding: '16px 20px',
+                marginTop: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '14px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '10px',
+                    background: 'rgba(229, 193, 88, 0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--gold-primary)'
+                  }}>
+                    <Filter size={18} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.94rem', fontWeight: 800, color: 'var(--gold-light)' }}>
+                      📦 Vault Box / Series Range Audit Filter
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      Filter vault items by Box series range (e.g. From <strong>B2000</strong> To <strong>B2800</strong>) to audit box by box
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700 }}>From:</span>
+                    <input
+                      type="text"
+                      className="custom-input"
+                      placeholder="e.g. B2000"
+                      value={auditRangeFrom}
+                      onChange={(e) => setAuditRangeFrom(e.target.value.toUpperCase())}
+                      style={{ width: '110px', padding: '6px 10px', fontSize: '0.85rem', minHeight: '36px', textAlign: 'center', fontWeight: 700, background: '#120407' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700 }}>To:</span>
+                    <input
+                      type="text"
+                      className="custom-input"
+                      placeholder="e.g. B2800"
+                      value={auditRangeTo}
+                      onChange={(e) => setAuditRangeTo(e.target.value.toUpperCase())}
+                      style={{ width: '110px', padding: '6px 10px', fontSize: '0.85rem', minHeight: '36px', textAlign: 'center', fontWeight: 700, background: '#120407' }}
+                    />
+                  </div>
+
+                  {(auditRangeFrom || auditRangeTo) && (
+                    <button
+                      type="button"
+                      onClick={() => { setAuditRangeFrom(''); setAuditRangeTo(''); }}
+                      className="btn-outline"
+                      style={{ padding: '6px 10px', fontSize: '0.78rem', minHeight: '36px', color: '#fca5a5', borderColor: 'rgba(239, 68, 68, 0.4)' }}
+                      title="Clear box series range filter"
+                    >
+                      ✕ Clear Range
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
