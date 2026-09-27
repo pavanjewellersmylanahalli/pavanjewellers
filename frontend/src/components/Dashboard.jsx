@@ -3,7 +3,7 @@ import {
   Building, Phone, MapPin, Plus, Search, Filter, ShieldCheck, 
   Coins, Scale, Award, ArrowUpRight, CheckCircle2, Clock, DollarSign, UserCheck,
   PackageCheck, BookOpen, CheckCircle, PlusCircle, AlertCircle, FileText, Trash2, Printer,
-  Camera, Upload, Calendar, User, RefreshCw, FileText as DetailsIcon
+  Camera, Upload, Calendar, User, RefreshCw, Pause, Play, RotateCcw, Save, FileText as DetailsIcon
 } from 'lucide-react';
 
 import GirviReceipt from './GirviReceipt';
@@ -1023,9 +1023,14 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                     <PackageCheck size={26} />
                   </div>
                   <div>
-                    <h2 className="gold-text" style={{ fontSize: '1.75rem', fontWeight: 800 }}>
-                      Girvi Vault Stock Audit
-                    </h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <h2 className="gold-text" style={{ fontSize: '1.75rem', fontWeight: 800 }}>
+                        Girvi Vault Stock Audit
+                      </h2>
+                      <span className="badge-success" style={{ fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <Save size={12} /> Auto-Saved
+                      </span>
+                    </div>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
                       Interactive Physical Locker Verification (Gold & Silver Audit)
                     </p>
@@ -1068,6 +1073,16 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                   </div>
 
                   <button
+                    className="btn-gold"
+                    onClick={() => setActiveTab('NEW_GIRVI')}
+                    style={{ padding: '6px 12px', fontSize: '0.8rem', minHeight: '36px' }}
+                    title="Pause audit progress & open New Girvi entry form"
+                  >
+                    <Pause size={14} />
+                    <span>Pause & New Girvi</span>
+                  </button>
+
+                  <button
                     className="btn-outline"
                     onClick={() => markAllAudit(uncheckedList)}
                     style={{ padding: '6px 12px', fontSize: '0.8rem', minHeight: '36px', color: '#34d399', borderColor: 'rgba(16, 185, 129, 0.4)' }}
@@ -1081,16 +1096,56 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                     className="btn-outline"
                     onClick={resetAuditSession}
                     style={{ padding: '6px 12px', fontSize: '0.8rem', minHeight: '36px', color: '#fca5a5', borderColor: 'rgba(239, 68, 68, 0.4)' }}
-                    title="Reset audit checklist"
+                    title="Reset audit checklist and restart stock audit"
                   >
-                    <RefreshCw size={14} />
-                    <span>Reset Audit</span>
+                    <RotateCcw size={14} />
+                    <span>Restart Audit</span>
                   </button>
                 </div>
               </div>
 
+              {/* Pause & Resume Info Card */}
+              <div style={{
+                marginTop: '16px',
+                padding: '10px 14px',
+                borderRadius: '10px',
+                background: 'rgba(229, 193, 88, 0.08)',
+                border: '1px solid rgba(229, 193, 88, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '10px',
+                fontSize: '0.82rem',
+                color: 'var(--gold-light)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Save size={16} color="var(--gold-primary)" />
+                  <span>
+                    <strong>Auto-Pause Active:</strong> Your verified checkmarks are saved instantly. If a customer comes, click <strong>"Pause & New Girvi"</strong> or any sidebar tab. When you return, your audit will resume right where you left off!
+                  </span>
+                </div>
+                {checkedCount > 0 && (
+                  <button
+                    onClick={resetAuditSession}
+                    style={{
+                      background: 'rgba(239, 68, 68, 0.2)',
+                      color: '#fca5a5',
+                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      borderRadius: '6px',
+                      padding: '3px 8px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Clear & Start Fresh
+                  </button>
+                )}
+              </div>
+
               {/* Audit Progress Bar */}
-              <div style={{ marginTop: '20px', background: 'rgba(10, 3, 6, 0.5)', padding: '14px 18px', borderRadius: '14px', border: '1px solid rgba(229, 193, 88, 0.2)' }}>
+              <div style={{ marginTop: '16px', background: 'rgba(10, 3, 6, 0.5)', padding: '14px 18px', borderRadius: '14px', border: '1px solid rgba(229, 193, 88, 0.2)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontSize: '0.88rem', fontWeight: 700, flexWrap: 'wrap', gap: '8px' }}>
                   <span style={{ color: 'var(--gold-light)' }}>
                     Physical Audit Progress: <strong style={{ color: '#34d399' }}>{checkedCount} / {totalAuditCount}</strong> items verified ({auditPercent}%)
