@@ -586,20 +586,6 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                   />
                 </div>
 
-                {/* Monthly Interest Rate */}
-                <div className="input-group">
-                  <label className="input-label">Monthly Interest Rate (%) *</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    className="custom-input"
-                    placeholder="e.g. 1.5"
-                    value={monthlyInterestRate}
-                    onChange={(e) => setMonthlyInterestRate(e.target.value)}
-                    required
-                    style={{ paddingLeft: '16px' }}
-                  />
-                </div>
               </div>
 
               {/* Loan Amount in Words (Auto-filled) */}
