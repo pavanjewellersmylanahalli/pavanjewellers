@@ -9,6 +9,7 @@ import {
 import GirviReceipt from './GirviReceipt';
 import GirviPassbookModal from './GirviPassbookModal';
 import EditGirviModal from './EditGirviModal';
+import LedgerPrintPdfModal from './LedgerPrintPdfModal';
 import CustomDatePicker from './CustomDatePicker';
 import { formatDate, calculateDueDate } from '../utils/dateUtils';
 import { exportLedgerToCSV } from '../utils/exportUtils';
@@ -87,6 +88,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const [selectedGirviForPrint, setSelectedGirviForPrint] = useState(null);
   const [selectedGirviForPassbook, setSelectedGirviForPassbook] = useState(null);
   const [selectedGirviForEdit, setSelectedGirviForEdit] = useState(null);
+  const [selectedGirvisForPdfReport, setSelectedGirvisForPdfReport] = useState(null);
 
   // Real Girvi items stored in LocalStorage for this shop
   const storageKey = `pavan_girvis_${shop?.id || shop?.login_mobile || 'default'}`;
@@ -1660,7 +1662,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                 <span>{isSyncing ? 'Syncing...' : 'Sync DB'}</span>
               </button>
 
-              {/* Export Ledger CSV Button */}
+              {/* Export Excel / CSV Button */}
               <button
                 className="btn-gold"
                 onClick={() => {
@@ -1670,11 +1672,28 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                                    'Master_Girvi_Ledger';
                   exportLedgerToCSV(filteredGirvis, `${shop?.shop_name || 'Pavan_Jewellers'}_${titleName}`);
                 }}
-                style={{ padding: '6px 14px', fontSize: '0.82rem', minHeight: '38px' }}
-                title="Download structured Excel / CSV ledger file"
+                style={{ padding: '6px 12px', fontSize: '0.8rem', minHeight: '38px' }}
+                title="Download structured Excel / CSV spreadsheet"
               >
-                <Download size={15} />
-                <span>Export Ledger (CSV)</span>
+                <Download size={14} />
+                <span>Excel / CSV</span>
+              </button>
+
+              {/* PDF / Printable Report Button */}
+              <button
+                className="btn-outline"
+                onClick={() => {
+                  const titleName = activeTab === 'GOLD_DASHBOARD' ? 'Gold Mortgage Ledger Report' :
+                                   activeTab === 'SILVER_DASHBOARD' ? 'Silver Mortgage Ledger Report' :
+                                   activeTab === 'RELEASE_LEDGER' ? 'Released Girvi Settlement Ledger Report' :
+                                   'Master Girvi Mortgage Ledger Report';
+                  setSelectedGirvisForPdfReport({ items: filteredGirvis, title: titleName });
+                }}
+                style={{ padding: '6px 12px', fontSize: '0.8rem', minHeight: '38px', color: '#c084fc', borderColor: 'rgba(168, 85, 247, 0.4)' }}
+                title="View and Print / Save PDF Ledger Report"
+              >
+                <Printer size={14} />
+                <span>PDF Report</span>
               </button>
 
               {/* Status Filter */}
@@ -1960,6 +1979,16 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
           girvi={selectedGirviForEdit}
           onClose={() => setSelectedGirviForEdit(null)}
           onSave={handleSaveEditedGirvi}
+        />
+      )}
+
+      {/* PDF / Printable Ledger Report Modal */}
+      {selectedGirvisForPdfReport && (
+        <LedgerPrintPdfModal
+          items={selectedGirvisForPdfReport.items}
+          shop={shop}
+          title={selectedGirvisForPdfReport.title}
+          onClose={() => setSelectedGirvisForPdfReport(null)}
         />
       )}
 
