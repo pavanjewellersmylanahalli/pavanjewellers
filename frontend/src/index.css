@@ -706,41 +706,48 @@ input[type=number] {
   text-align: center;
 }
 
-/* Financial Box */
+/* Financial Box (Stacked 2-Line Format) */
 .financial-grid-box {
   display: flex;
+  flex-direction: column;
   border: 1.5px solid #000000;
   margin-bottom: 0;
 }
 
-.fin-box-left {
-  width: 170px;
-  border-right: 1px solid #000;
-  padding: 5px 8px;
+.fin-row-top {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #000000;
+  padding: 4px 8px;
+  gap: 16px;
 }
 
-.fin-box-right {
-  flex: 1;
-  padding: 5px 8px;
+.fin-row-bottom {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  gap: 16px;
 }
 
 .fin-lbl {
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   font-weight: 800;
-  color: #444;
+  color: #000000;
+  min-width: 175px;
+  letter-spacing: 0.3px;
 }
 
 .fin-val {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 900;
   color: #000000;
 }
 
 .fin-words {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 800;
   font-style: italic;
-  margin-top: 2px;
+  color: #000000;
 }
 
 .statutory-notice-wrapper {
@@ -1047,28 +1054,38 @@ input[type=number] {
   }
 
   .financial-grid-box {
-    margin-bottom: 6px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border: 1.5px solid #000000 !important;
+    margin-bottom: 0 !important;
   }
 
-  .fin-box-left {
-    width: 165px !important;
-    padding: 4px 6px !important;
+  .fin-row-top {
+    display: flex !important;
+    align-items: center !important;
+    border-bottom: 1px solid #000000 !important;
+    padding: 3px 6px !important;
+    gap: 12px !important;
   }
 
-  .fin-box-right {
-    padding: 4px 6px !important;
+  .fin-row-bottom {
+    display: flex !important;
+    align-items: center !important;
+    padding: 3px 6px !important;
+    gap: 12px !important;
   }
 
   .fin-lbl {
-    font-size: 0.62rem !important;
+    font-size: 0.66rem !important;
+    min-width: 165px !important;
   }
 
   .fin-val {
-    font-size: 1.18rem !important;
+    font-size: 1.2rem !important;
   }
 
   .fin-words {
-    font-size: 0.86rem !important;
+    font-size: 0.88rem !important;
   }
 
   .statutory-notice-wrapper {

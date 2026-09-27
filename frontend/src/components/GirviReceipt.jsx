@@ -100,13 +100,13 @@ export default function GirviReceipt({ girvi, shop, onClose }) {
 
       {/* Financial Box */}
       <div className="financial-grid-box">
-        <div className="fin-box-left">
-          <div className="fin-lbl">PRINCIPAL LOAN AMOUNT</div>
-          <div className="fin-val">₹{Number(girvi.loanAmount || 0).toLocaleString('en-IN')}</div>
+        <div className="fin-row-top">
+          <span className="fin-lbl">PRINCIPAL LOAN AMOUNT</span>
+          <span className="fin-val">₹{Number(girvi.loanAmount || 0).toLocaleString('en-IN')}</span>
         </div>
-        <div className="fin-box-right">
-          <div className="fin-lbl">RUPEES IN WORDS</div>
-          <div className="fin-words">{girvi.loanAmountInWords || 'Seven Thousand Only'}</div>
+        <div className="fin-row-bottom">
+          <span className="fin-lbl">RUPEES IN WORDS</span>
+          <span className="fin-words">{girvi.loanAmountInWords || 'Seven Thousand Only'}</span>
         </div>
       </div>
 
