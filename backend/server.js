@@ -373,7 +373,7 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// 5. GIRVI SYNC ENDPOINTS (Ultra-fast sync)
+// 5. GIRVI SYNC ENDPOINTS (Ultra-fast sync with Supabase DB)
 app.get('/api/girvis/:shopId', async (req, res) => {
   try {
     const { shopId } = req.params;
@@ -385,7 +385,10 @@ app.get('/api/girvis/:shopId', async (req, res) => {
         .order('created_at', { ascending: false });
 
       if (!error && data) {
-        return res.json({ success: true, girvis: data.map(d => d.data || d) });
+        return res.json({ 
+          success: true, 
+          girvis: data.map(d => ({ ...(d.data || {}), ...d, id: d.id }))
+        });
       }
     }
     return res.json({ success: true, girvis: [] });
@@ -398,20 +401,46 @@ app.post('/api/girvis', async (req, res) => {
   try {
     const { shopId, girvi } = req.body;
     if (supabase && shopId && girvi) {
-      await supabase.from('girvis').upsert([{
-        id: girvi.id,
-        shop_id: shopId,
-        data: girvi,
-        status: girvi.status || 'ACTIVE',
+      const { error } = await supabase.from('girvis').upsert([{
+        id: String(girvi.id),
+        shop_id: String(shopId),
+        pledge_date: girvi.pledgeDate || null,
+        due_date: girvi.dueDate || null,
+        customer_name: girvi.customerName || '',
+        relation_type: girvi.relationType || 'S/O',
+        relation_name: girvi.relationName || '',
+        mobile: girvi.mobile || '',
+        monthly_income: girvi.monthlyIncome ? Number(girvi.monthlyIncome) : 0,
+        address: girvi.address || '',
+        customer_photo: girvi.customerPhoto || null,
         metal: girvi.metal || 'Gold',
+        article_name: girvi.articleName || '',
+        gross_wt: girvi.grossWt ? Number(girvi.grossWt) : 0,
+        less_wt: girvi.lessWt ? Number(girvi.lessWt) : 0,
+        quantity: girvi.quantity ? Number(girvi.quantity) : 1,
+        present_value: girvi.presentValue ? Number(girvi.presentValue) : 0,
+        loan_amount: girvi.loanAmount ? Number(girvi.loanAmount) : 0,
+        loan_amount_in_words: girvi.loanAmountInWords || '',
+        interest_rate: girvi.interestRate || '1.5%',
+        item_photo: girvi.itemPhoto || null,
+        status: girvi.status || 'ACTIVE',
+        data: girvi,
         updated_at: new Date().toISOString()
-      }]);
+      }], { onConflict: 'id' });
+
+      if (error) {
+        console.error('Supabase Girvi save error:', error.message);
+      } else {
+        console.log(`✅ Girvi entry ${girvi.id} saved to Supabase DB successfully.`);
+      }
     }
     return res.json({ success: true });
   } catch (err) {
+    console.error('Girvi endpoint error:', err);
     return res.json({ success: true });
   }
 });
+
 
 // 6. LIVE GOLD & SILVER RATES (Fetched from Global Spot & Currency Markets)
 app.get('/api/metal-rates', async (req, res) => {

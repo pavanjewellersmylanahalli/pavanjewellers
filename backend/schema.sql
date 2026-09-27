@@ -51,3 +51,40 @@ VALUES (
     'Main Bazaar, Jewelers Market, Mylanahalli'
 )
 ON CONFLICT (login_mobile) DO NOTHING;
+
+-- Create Girvis (Pledges) Table
+CREATE TABLE IF NOT EXISTS public.girvis (
+    id TEXT PRIMARY KEY,
+    shop_id TEXT NOT NULL,
+    pledge_date TEXT,
+    due_date TEXT,
+    customer_name TEXT NOT NULL,
+    relation_type TEXT,
+    relation_name TEXT,
+    mobile VARCHAR(15),
+    monthly_income NUMERIC,
+    address TEXT,
+    customer_photo TEXT,
+    metal TEXT NOT NULL DEFAULT 'Gold',
+    article_name TEXT NOT NULL,
+    gross_wt NUMERIC DEFAULT 0,
+    less_wt NUMERIC DEFAULT 0,
+    quantity INT DEFAULT 1,
+    present_value NUMERIC DEFAULT 0,
+    loan_amount NUMERIC NOT NULL DEFAULT 0,
+    loan_amount_in_words TEXT,
+    interest_rate TEXT,
+    item_photo TEXT,
+    status TEXT NOT NULL DEFAULT 'ACTIVE',
+    data JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Index on shop_id and status for fast queries
+CREATE INDEX IF NOT EXISTS idx_girvis_shop_id ON public.girvis(shop_id);
+CREATE INDEX IF NOT EXISTS idx_girvis_status ON public.girvis(status);
+
+ALTER TABLE public.girvis ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public manage on girvis" ON public.girvis FOR ALL USING (true);
+
