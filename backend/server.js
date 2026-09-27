@@ -252,6 +252,9 @@ app.post('/api/auth/register-shop', async (req, res) => {
 
       if (insertError) {
         console.error('Supabase Insert Error:', insertError);
+        if (insertError.message && insertError.message.includes('schema cache')) {
+          return res.status(400).json({ error: "Supabase table 'shops' not found. Please run the SQL script in your Supabase SQL Editor to create the table." });
+        }
         return res.status(400).json({ error: insertError.message || 'Error registering shop in Supabase' });
       }
 
