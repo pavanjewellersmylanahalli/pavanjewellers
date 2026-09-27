@@ -150,8 +150,22 @@ export default function GirviReceipt({ girvi, shop, onClose }) {
             <td className="center-txt bold-txt">{girvi.weight || `${girvi.grossWt - girvi.lessWt}g`}</td>
             <td className="center-txt">{girvi.presentValue ? `₹${girvi.presentValue}` : '—'}</td>
           </tr>
-          <tr><td className="center-txt">2</td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td className="center-txt">3</td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr>
+            <td className="center-txt">2</td>
+            <td></td>
+            <td><div className="wt-cell"><span></span><span></span></div></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td className="center-txt">3</td>
+            <td></td>
+            <td><div className="wt-cell"><span></span><span></span></div></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
         </tbody>
       </table>
 
