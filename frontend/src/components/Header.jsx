@@ -50,7 +50,7 @@ export default function Header({ shop, onLogout }) {
         </div>
 
         {/* Live Rates Ticker Preview */}
-        <div style={{
+        <div className="header-ticker" style={{
           display: 'flex',
           alignItems: 'center',
           gap: '16px',

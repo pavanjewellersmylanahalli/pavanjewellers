@@ -110,7 +110,7 @@ export default function Dashboard({ shop }) {
       </div>
 
       {/* Analytics Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '18px', marginBottom: '32px' }}>
+      <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '18px', marginBottom: '32px' }}>
         
         {/* Card 1 */}
         <div className="glass-card" style={{ padding: '20px' }}>
