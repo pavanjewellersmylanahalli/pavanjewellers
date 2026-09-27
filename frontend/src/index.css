@@ -645,7 +645,7 @@ input[type=number] {
 .pawner-grid-container {
   display: flex;
   border: 1.5px solid #000000;
-  margin-bottom: 8px;
+  margin-bottom: -1.5px;
 }
 
 .pawner-details {
@@ -710,7 +710,7 @@ input[type=number] {
 .financial-grid-box {
   display: flex;
   border: 1.5px solid #000000;
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 
 .fin-box-left {
@@ -744,8 +744,8 @@ input[type=number] {
 }
 
 .statutory-notice-wrapper {
-  margin-top: 3px;
-  margin-bottom: 5px;
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 .statutory-notice {
@@ -769,7 +769,7 @@ input[type=number] {
   border-collapse: collapse;
   border: 1.5px solid #000;
   font-size: 0.78rem;
-  margin-bottom: 8px;
+  margin-bottom: -1.5px;
 }
 
 .pawn-articles-table th,
@@ -818,7 +818,7 @@ input[type=number] {
   font-size: 0.82rem;
   border: 1.5px solid #000;
   padding: 4px;
-  margin-bottom: 8px;
+  margin-bottom: -1.5px;
 }
 
 .summary-bar-grid {
@@ -826,7 +826,7 @@ input[type=number] {
   border: 1.5px solid #000;
   font-size: 0.82rem;
   font-weight: 800;
-  margin-bottom: 10px;
+  margin-bottom: -1.5px;
 }
 
 .summary-bar-grid>div {
@@ -843,27 +843,27 @@ input[type=number] {
 /* Signatures Grid */
 .signatures-grid-box {
   display: flex;
-  gap: 10px;
+  border: 1.5px solid #000;
+  margin-bottom: 0;
 }
 
 .sig-box-left {
   width: 45%;
-  border: 1.5px solid #000;
-  padding: 6px 8px;
+  border-right: 1.5px solid #000;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 85px;
+  min-height: 110px;
 }
 
 .sig-box-right {
-  width: 55%;
-  border: 1.5px solid #000;
-  padding: 6px 8px;
+  flex: 1;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 85px;
+  min-height: 110px;
 }
 
 .sig-header {
@@ -883,7 +883,7 @@ input[type=number] {
   font-size: 0.65rem;
   font-weight: 800;
   padding-top: 4px;
-  margin-top: 16px;
+  margin-top: 28px;
 }
 
 /* Tear Line */
@@ -1076,6 +1076,19 @@ input[type=number] {
     margin-bottom: 4px !important;
   }
 
+  .pawner-grid-container {
+    margin-bottom: -1.5px !important;
+  }
+
+  .financial-grid-box {
+    margin-bottom: 0 !important;
+  }
+
+  .statutory-notice-wrapper {
+    margin-top: 3px !important;
+    margin-bottom: 3px !important;
+  }
+
   .statutory-notice {
     font-size: 0.72rem !important;
     line-height: 1.2 !important;
@@ -1089,7 +1102,7 @@ input[type=number] {
   }
 
   .pawn-articles-table {
-    margin-bottom: 6px !important;
+    margin-bottom: -1.5px !important;
   }
 
   .pawn-articles-table th,
@@ -1105,12 +1118,12 @@ input[type=number] {
   .kannada-note-box {
     padding: 3px !important;
     font-size: 0.8rem !important;
-    margin-bottom: 6px !important;
+    margin-bottom: -1.5px !important;
   }
 
   .summary-bar-grid {
     font-size: 0.8rem !important;
-    margin-bottom: 6px !important;
+    margin-bottom: -1.5px !important;
   }
 
   .summary-bar-grid > div {
@@ -1118,13 +1131,25 @@ input[type=number] {
   }
 
   .signatures-grid-box {
-    gap: 10px !important;
+    display: flex !important;
+    border: 1.5px solid #000 !important;
+    margin-bottom: 0 !important;
+    gap: 0 !important;
   }
 
-  .sig-box-left,
+  .sig-box-left {
+    width: 45% !important;
+    border: none !important;
+    border-right: 1.5px solid #000 !important;
+    min-height: 100px !important;
+    padding: 6px 8px !important;
+  }
+
   .sig-box-right {
-    min-height: 80px !important;
-    padding: 5px 8px !important;
+    flex: 1 !important;
+    border: none !important;
+    min-height: 100px !important;
+    padding: 6px 8px !important;
   }
 
   .sig-header {
@@ -1139,7 +1164,7 @@ input[type=number] {
   .sig-footer-line {
     font-size: 0.66rem !important;
     padding-top: 3px !important;
-    margin-top: 16px !important;
+    margin-top: 24px !important;
   }
 
   .ticket-tear-line {
