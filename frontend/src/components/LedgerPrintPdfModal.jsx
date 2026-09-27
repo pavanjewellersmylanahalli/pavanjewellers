@@ -21,7 +21,7 @@ export default function LedgerPrintPdfModal({ items, shop, title, onClose }) {
   return (
     <div className="receipt-modal-backdrop" style={{ zIndex: 1100 }}>
       {/* Modal Header Controls (Screen only - hidden when printing) */}
-      <div className="receipt-modal-actions no-print" style={{ maxWidth: '1000px', width: '100%', marginBottom: '16px' }}>
+      <div className="receipt-modal-actions no-print" style={{ maxWidth: '1100px', width: '100%', marginBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <FileText color="var(--gold-primary)" size={22} />
           <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--gold-light)' }}>
@@ -43,8 +43,8 @@ export default function LedgerPrintPdfModal({ items, shop, title, onClose }) {
 
       {/* Printable Report Paper */}
       <div className="glass-card printable-ledger-paper" style={{
-        maxWidth: '1000px', width: '100%', maxHeight: '85vh', overflowY: 'auto',
-        background: '#ffffff', color: '#000000', padding: '32px 36px', borderRadius: '12px'
+        maxWidth: '1100px', width: '100%', maxHeight: '85vh', overflowY: 'auto',
+        background: '#ffffff', color: '#000000', padding: '32px 36px', borderRadius: '12px', boxSizing: 'border-box'
       }}>
         
         {/* Printable Shop Header */}
