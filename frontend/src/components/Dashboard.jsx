@@ -3,7 +3,7 @@ import {
   Building, Phone, MapPin, Plus, Search, Filter, ShieldCheck, 
   Coins, Scale, Award, ArrowUpRight, CheckCircle2, Clock, DollarSign, UserCheck,
   PackageCheck, BookOpen, CheckCircle, PlusCircle, AlertCircle, FileText, Trash2, Printer,
-  Camera, Upload, Calendar, User, FileText as DetailsIcon
+  Camera, Upload, Calendar, User, RefreshCw, FileText as DetailsIcon
 } from 'lucide-react';
 
 import GirviReceipt from './GirviReceipt';
