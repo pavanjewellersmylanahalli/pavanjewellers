@@ -2,8 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { 
   Building, Phone, MapPin, Plus, Search, Filter, ShieldCheck, 
   Coins, Scale, Award, ArrowUpRight, CheckCircle2, Clock, DollarSign, UserCheck,
-  PackageCheck, BookOpen, CheckCircle, PlusCircle, AlertCircle, FileText, Trash2, Printer
+  PackageCheck, BookOpen, CheckCircle, PlusCircle, AlertCircle, FileText, Trash2, Printer,
+  Camera, Upload, Calendar, User, FileText as DetailsIcon
 } from 'lucide-react';
+
+// Helper function to convert Indian Currency numbers to Words
+function numberToWordsINR(num) {
+  if (!num || isNaN(num) || num <= 0) return '';
+  const n = Math.floor(num);
+  const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+  function inWords(val) {
+    if (val < 20) return a[val];
+    if (val < 100) return b[Math.floor(val / 10)] + (val % 10 ? ' ' + a[val % 10] : '');
+    if (val < 1000) return a[Math.floor(val / 100)] + ' Hundred' + (val % 100 ? ' ' + inWords(val % 100) : '');
+    if (val < 100000) return inWords(Math.floor(val / 1000)) + ' Thousand' + (val % 1000 ? ' ' + inWords(val % 1000) : '');
+    if (val < 10000000) return inWords(Math.floor(val / 100000)) + ' Lakh' + (val % 100000 ? ' ' + inWords(val % 100000) : '');
+    return inWords(Math.floor(val / 10000000)) + ' Crore' + (val % 10000000 ? ' ' + inWords(val % 10000000) : '');
+  }
+  return inWords(n) + ' Rupees Only';
+}
 
 export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,20 +50,45 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
   }, [girvis, storageKey]);
 
   // Form states for New Girvi Entry
-  const [newCustomerName, setNewCustomerName] = useState('');
-  const [newCustomerMobile, setNewCustomerMobile] = useState('');
-  const [newMetalType, setNewMetalType] = useState('Gold');
-  const [newWeight, setNewWeight] = useState('');
-  const [newPurity, setNewPurity] = useState('22K');
-  const [newLoanAmount, setNewLoanAmount] = useState('');
-  const [newInterestRate, setNewInterestRate] = useState('1.5');
-  const [newItemDesc, setNewItemDesc] = useState('');
-  const [newVaultLocker, setNewVaultLocker] = useState('V-01');
+  const todayStr = new Date().toISOString().split('T')[0];
+  const nextYearStr = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+  const [pledgeNumber, setPledgeNumber] = useState(`GV-${Date.now().toString().slice(-6)}`);
+  const [pledgeDate, setPledgeDate] = useState(todayStr);
+  const [dueDate, setDueDate] = useState(nextYearStr);
+  
+  const [customerName, setCustomerName] = useState('');
+  const [relationType, setRelationType] = useState('S/O');
+  const [relationName, setRelationName] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [monthlyIncome, setMonthlyIncome] = useState('');
+  const [address, setAddress] = useState('');
+  const [customerPhoto, setCustomerPhoto] = useState(null);
+
+  // Article Details
+  const [metal, setMetal] = useState('Gold');
+  const [articleName, setArticleName] = useState('');
+  const [grossWt, setGrossWt] = useState('');
+  const [lessWt, setLessWt] = useState('0');
+  const [quantity, setQuantity] = useState('1');
+  const [presentValue, setPresentValue] = useState('');
+
+  // Financials
+  const [loanAmount, setLoanAmount] = useState('');
+  const [monthlyInterestRate, setMonthlyInterestRate] = useState('1.5');
+  const [itemPhoto, setItemPhoto] = useState(null);
+
+  // Auto calculate Net Wt: Gross Wt - Less Wt
+  const grossNum = parseFloat(grossWt) || 0;
+  const lessNum = parseFloat(lessWt) || 0;
+  const netWt = Math.max(0, grossNum - lessNum).toFixed(2);
+
+  // Auto calculate Loan Amount in Words
+  const loanNum = parseFloat(loanAmount) || 0;
+  const loanAmountInWords = numberToWordsINR(loanNum);
 
   // Dynamic Real Metrics Calculations
   const activeGirvis = girvis.filter(i => i.status === 'ACTIVE');
-  const releasedGirvis = girvis.filter(i => i.status === 'RELEASED');
-
   const totalActiveCount = activeGirvis.length;
   const totalGoldCount = activeGirvis.filter(i => i.metal === 'Gold').length;
   const totalSilverCount = activeGirvis.filter(i => i.metal === 'Silver').length;
@@ -74,6 +118,18 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
 
   const uniqueCustomers = new Set(girvis.map(i => i.mobile)).size;
 
+  // Image Upload Handlers
+  const handlePhotoUpload = (e, setPhotoState) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoState(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Filtering based on active tab & search
   const getFilteredItems = () => {
     let items = girvis;
@@ -96,7 +152,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
         i.customerName.toLowerCase().includes(q) ||
         i.id.toLowerCase().includes(q) ||
         i.mobile.includes(q) ||
-        i.itemDescription.toLowerCase().includes(q)
+        (i.articleName && i.articleName.toLowerCase().includes(q))
       );
     }
 
@@ -108,36 +164,56 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const handleCreateNewGirvi = (e) => {
     e.preventDefault();
     
-    if (!newCustomerName || !newCustomerMobile || !newWeight || !newLoanAmount) {
-      alert('Please fill in all required fields.');
+    if (!customerName || !mobile || !address || !articleName || !grossWt || !loanAmount) {
+      alert('Please fill in all required fields marked with *');
       return;
     }
 
     const newRecord = {
-      id: `GV-${Date.now().toString().slice(-6)}`,
-      customerName: newCustomerName.trim(),
-      mobile: newCustomerMobile.trim(),
-      metal: newMetalType,
-      purity: newPurity.trim(),
-      weight: `${parseFloat(newWeight)}g`,
-      rawWeight: parseFloat(newWeight) || 0,
-      loanAmount: Number(newLoanAmount),
-      interestRate: `${newInterestRate}%`,
-      rawInterestRate: parseFloat(newInterestRate) || 1.5,
-      itemDescription: newItemDesc.trim(),
-      vaultLocker: newVaultLocker,
-      date: new Date().toISOString().split('T')[0],
+      id: pledgeNumber || `GV-${Date.now().toString().slice(-6)}`,
+      pledgeDate,
+      dueDate,
+      customerName: customerName.trim(),
+      relationType,
+      relationName: relationName.trim(),
+      mobile: mobile.trim(),
+      monthlyIncome: monthlyIncome ? Number(monthlyIncome) : 0,
+      address: address.trim(),
+      customerPhoto,
+      
+      metal,
+      articleName: articleName.trim(),
+      grossWt: parseFloat(grossWt) || 0,
+      lessWt: parseFloat(lessWt) || 0,
+      weight: `${netWt}g`,
+      rawWeight: parseFloat(netWt) || 0,
+      quantity: Number(quantity) || 1,
+      presentValue: presentValue ? Number(presentValue) : 0,
+
+      loanAmount: Number(loanAmount),
+      loanAmountInWords,
+      interestRate: `${monthlyInterestRate}%`,
+      itemPhoto,
       status: 'ACTIVE'
     };
 
     setGirvis([newRecord, ...girvis]);
 
     // Reset Form
-    setNewCustomerName('');
-    setNewCustomerMobile('');
-    setNewWeight('');
-    setNewLoanAmount('');
-    setNewItemDesc('');
+    setPledgeNumber(`GV-${Date.now().toString().slice(-6)}`);
+    setCustomerName('');
+    setRelationName('');
+    setMobile('');
+    setMonthlyIncome('');
+    setAddress('');
+    setCustomerPhoto(null);
+    setArticleName('');
+    setGrossWt('');
+    setLessWt('0');
+    setQuantity('1');
+    setPresentValue('');
+    setLoanAmount('');
+    setItemPhoto(null);
     
     alert(`✅ New Girvi Entry ${newRecord.id} saved successfully!`);
     setActiveTab('TOTAL_LEDGER');
@@ -169,11 +245,11 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
       
       {/* ================= OPTION 1: NEW GIRVI FORM ================= */}
       {activeTab === 'NEW_GIRVI' && (
-        <div className="glass-card" style={{ maxWidth: '720px', margin: '0 auto', padding: '32px 24px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <div className="glass-card" style={{ maxWidth: '840px', margin: '0 auto', padding: '32px 28px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <div style={{
-              width: '50px',
-              height: '50px',
+              width: '54px',
+              height: '54px',
               margin: '0 auto 12px',
               borderRadius: '50%',
               background: 'rgba(229, 193, 88, 0.15)',
@@ -182,157 +258,383 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
               justifyContent: 'center',
               color: 'var(--gold-primary)'
             }}>
-              <PlusCircle size={28} />
+              <PlusCircle size={30} />
             </div>
-            <h2 className="gold-text" style={{ fontSize: '1.75rem', fontWeight: 800 }}>
+            <h2 className="gold-text" style={{ fontSize: '1.85rem', fontWeight: 800 }}>
               New Girvi Entry Form
             </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.86rem', marginTop: '4px' }}>
-              Pawn Gold / Silver ornament, calculate interest & issue loan receipt
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginTop: '4px' }}>
+              Issue new pawn mortgage loan & generate customer slip
             </p>
           </div>
 
           <form onSubmit={handleCreateNewGirvi}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
-              
-              {/* Customer Name */}
-              <div className="input-group">
-                <label className="input-label">Customer Full Name *</label>
-                <div className="input-wrapper">
+            
+            {/* SECTION 1: PLEDGE & CUSTOMER DETAILS */}
+            <div style={{
+              background: 'rgba(10, 3, 6, 0.4)',
+              border: '1px solid rgba(229, 193, 88, 0.2)',
+              borderRadius: '16px',
+              padding: '20px',
+              marginBottom: '24px'
+            }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <User size={18} /> Section 1: Pledge & Customer Details
+              </h3>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                {/* Pledge Number */}
+                <div className="input-group">
+                  <label className="input-label">Pledge Number *</label>
                   <input
                     type="text"
                     className="custom-input"
-                    placeholder="Enter Customer Name"
-                    value={newCustomerName}
-                    onChange={(e) => setNewCustomerName(e.target.value)}
+                    value={pledgeNumber}
+                    onChange={(e) => setPledgeNumber(e.target.value)}
                     required
                     style={{ paddingLeft: '16px' }}
                   />
                 </div>
-              </div>
 
-              {/* Customer Mobile */}
-              <div className="input-group">
-                <label className="input-label">Customer Mobile Number *</label>
-                <div className="input-wrapper">
+                {/* Pledge Date */}
+                <div className="input-group">
+                  <label className="input-label">Pledge Date *</label>
+                  <input
+                    type="date"
+                    className="custom-input"
+                    value={pledgeDate}
+                    onChange={(e) => setPledgeDate(e.target.value)}
+                    required
+                    style={{ paddingLeft: '16px', background: '#120407' }}
+                  />
+                </div>
+
+                {/* Due Date */}
+                <div className="input-group">
+                  <label className="input-label">Due Date *</label>
+                  <input
+                    type="date"
+                    className="custom-input"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    required
+                    style={{ paddingLeft: '16px', background: '#120407' }}
+                  />
+                </div>
+
+                {/* Customer Name */}
+                <div className="input-group">
+                  <label className="input-label">Customer Name *</label>
+                  <input
+                    type="text"
+                    className="custom-input"
+                    placeholder="Enter Customer Full Name"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    required
+                    style={{ paddingLeft: '16px' }}
+                  />
+                </div>
+
+                {/* Relation Type */}
+                <div className="input-group">
+                  <label className="input-label">Relation Type</label>
+                  <select
+                    className="custom-input"
+                    value={relationType}
+                    onChange={(e) => setRelationType(e.target.value)}
+                    style={{ paddingLeft: '16px', background: '#120407' }}
+                  >
+                    <option value="S/O">S/O (Son of)</option>
+                    <option value="D/O">D/O (Daughter of)</option>
+                    <option value="W/O">W/O (Wife of)</option>
+                    <option value="C/O">C/O (Care of)</option>
+                  </select>
+                </div>
+
+                {/* Relation Name */}
+                <div className="input-group">
+                  <label className="input-label">Relation Name</label>
+                  <input
+                    type="text"
+                    className="custom-input"
+                    placeholder="Father / Husband / Relative Name"
+                    value={relationName}
+                    onChange={(e) => setRelationName(e.target.value)}
+                    style={{ paddingLeft: '16px' }}
+                  />
+                </div>
+
+                {/* Mobile Number */}
+                <div className="input-group">
+                  <label className="input-label">Mobile Number *</label>
                   <input
                     type="tel"
                     className="custom-input"
                     placeholder="10-digit Mobile Number"
                     maxLength={10}
-                    value={newCustomerMobile}
-                    onChange={(e) => setNewCustomerMobile(e.target.value.replace(/\D/g, ''))}
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
+                    required
+                    style={{ paddingLeft: '16px' }}
+                  />
+                </div>
+
+                {/* Monthly Income */}
+                <div className="input-group">
+                  <label className="input-label">Monthly Income (₹) *</label>
+                  <input
+                    type="number"
+                    className="custom-input"
+                    placeholder="e.g. 50000"
+                    value={monthlyIncome}
+                    onChange={(e) => setMonthlyIncome(e.target.value)}
                     required
                     style={{ paddingLeft: '16px' }}
                   />
                 </div>
               </div>
 
-              {/* Metal Type */}
-              <div className="input-group">
-                <label className="input-label">Pawn Metal Category *</label>
-                <select
+              {/* Address */}
+              <div className="input-group" style={{ marginTop: '12px' }}>
+                <label className="input-label">Full Address *</label>
+                <textarea
                   className="custom-input"
-                  value={newMetalType}
-                  onChange={(e) => setNewMetalType(e.target.value)}
-                  style={{ paddingLeft: '16px', background: '#120407' }}
-                >
-                  <option value="Gold">🥇 Gold (22K / 24K)</option>
-                  <option value="Silver">🥈 Silver (92.5 Fine / 999)</option>
-                </select>
+                  placeholder="Enter complete house address & area"
+                  rows={2}
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  required
+                  style={{ paddingLeft: '16px', paddingTop: '10px', height: 'auto' }}
+                />
               </div>
 
-              {/* Purity / Karat */}
-              <div className="input-group">
-                <label className="input-label">Metal Purity / Karat *</label>
+              {/* Customer Photo Upload */}
+              <div style={{ marginTop: '14px' }}>
+                <label className="input-label">Customer Photo (Select from Gallery or Camera)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginTop: '6px' }}>
+                  <label className="btn-outline" style={{ cursor: 'pointer', padding: '10px 16px', fontSize: '0.85rem' }}>
+                    <Camera size={16} />
+                    <span>Upload / Capture Photo</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={(e) => handlePhotoUpload(e, setCustomerPhoto)}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                  {customerPhoto && (
+                    <img 
+                      src={customerPhoto} 
+                      alt="Customer Preview" 
+                      style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--gold-primary)' }} 
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 2: ARTICLE DETAILS */}
+            <div style={{
+              background: 'rgba(10, 3, 6, 0.4)',
+              border: '1px solid rgba(229, 193, 88, 0.2)',
+              borderRadius: '16px',
+              padding: '20px',
+              marginBottom: '24px'
+            }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <DetailsIcon size={18} /> Section 2: Article Details
+              </h3>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                {/* Gold or Silver */}
+                <div className="input-group">
+                  <label className="input-label">Category *</label>
+                  <select
+                    className="custom-input"
+                    value={metal}
+                    onChange={(e) => setMetal(e.target.value)}
+                    style={{ paddingLeft: '16px', background: '#120407' }}
+                  >
+                    <option value="Gold">🥇 Gold</option>
+                    <option value="Silver">🥈 Silver</option>
+                  </select>
+                </div>
+
+                {/* Article Name */}
+                <div className="input-group">
+                  <label className="input-label">Article Name *</label>
+                  <input
+                    type="text"
+                    className="custom-input"
+                    placeholder="e.g. Bangle, Chain, Ring, Necklace"
+                    value={articleName}
+                    onChange={(e) => setArticleName(e.target.value)}
+                    required
+                    style={{ paddingLeft: '16px' }}
+                  />
+                </div>
+
+                {/* Gross Weight */}
+                <div className="input-group">
+                  <label className="input-label">Gross Wt (grams) *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    className="custom-input"
+                    placeholder="e.g. 26.50"
+                    value={grossWt}
+                    onChange={(e) => setGrossWt(e.target.value)}
+                    required
+                    style={{ paddingLeft: '16px' }}
+                  />
+                </div>
+
+                {/* Less Weight */}
+                <div className="input-group">
+                  <label className="input-label">Less Wt (stones/dross g)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    className="custom-input"
+                    placeholder="e.g. 1.50"
+                    value={lessWt}
+                    onChange={(e) => setLessWt(e.target.value)}
+                    style={{ paddingLeft: '16px' }}
+                  />
+                </div>
+
+                {/* Net Weight (Auto-calculated) */}
+                <div className="input-group">
+                  <div className="input-label">
+                    <span>Net Wt (Auto-calculated)</span>
+                    <span className="badge-gold">Gross - Less</span>
+                  </div>
+                  <input
+                    type="text"
+                    className="custom-input"
+                    value={`${netWt} g`}
+                    readOnly
+                    style={{ paddingLeft: '16px', background: 'rgba(229, 193, 88, 0.1)', fontWeight: 700, color: 'var(--gold-light)' }}
+                  />
+                </div>
+
+                {/* Quantity */}
+                <div className="input-group">
+                  <label className="input-label">Quantity</label>
+                  <input
+                    type="number"
+                    className="custom-input"
+                    placeholder="1"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    style={{ paddingLeft: '16px' }}
+                  />
+                </div>
+
+                {/* Present Value */}
+                <div className="input-group">
+                  <label className="input-label">Present Value (₹)</label>
+                  <input
+                    type="number"
+                    className="custom-input"
+                    placeholder="e.g. 200000"
+                    value={presentValue}
+                    onChange={(e) => setPresentValue(e.target.value)}
+                    style={{ paddingLeft: '16px' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 3: FINANCIALS & LOAN DETAILS */}
+            <div style={{
+              background: 'rgba(10, 3, 6, 0.4)',
+              border: '1px solid rgba(229, 193, 88, 0.2)',
+              borderRadius: '16px',
+              padding: '20px',
+              marginBottom: '24px'
+            }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <DollarSign size={18} /> Section 3: Financials & Loan Details
+              </h3>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+                {/* Loan Amount */}
+                <div className="input-group">
+                  <label className="input-label">Loan Amount Sanctioned (₹) *</label>
+                  <input
+                    type="number"
+                    className="custom-input"
+                    placeholder="e.g. 150000"
+                    value={loanAmount}
+                    onChange={(e) => setLoanAmount(e.target.value)}
+                    required
+                    style={{ paddingLeft: '16px', fontSize: '1.2rem', fontWeight: '800', color: 'var(--gold-light)' }}
+                  />
+                </div>
+
+                {/* Monthly Interest Rate */}
+                <div className="input-group">
+                  <label className="input-label">Monthly Interest Rate (%) *</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    className="custom-input"
+                    placeholder="e.g. 1.5"
+                    value={monthlyInterestRate}
+                    onChange={(e) => setMonthlyInterestRate(e.target.value)}
+                    required
+                    style={{ paddingLeft: '16px' }}
+                  />
+                </div>
+              </div>
+
+              {/* Loan Amount in Words (Auto-filled) */}
+              <div className="input-group" style={{ marginTop: '12px' }}>
+                <div className="input-label">
+                  <span>Loan Amount in Words (Auto-filled)</span>
+                  <span className="badge-gold">INR Words</span>
+                </div>
                 <input
                   type="text"
                   className="custom-input"
-                  placeholder="e.g. 22K or 92.5 Fine"
-                  value={newPurity}
-                  onChange={(e) => setNewPurity(e.target.value)}
-                  required
-                  style={{ paddingLeft: '16px' }}
+                  value={loanAmountInWords || 'Enter loan amount above...'}
+                  readOnly
+                  style={{ paddingLeft: '16px', background: 'rgba(16, 185, 129, 0.1)', color: '#6ee7b7', fontWeight: 700 }}
                 />
               </div>
 
-              {/* Weight */}
-              <div className="input-group">
-                <label className="input-label">Net Weight (Grams) *</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  className="custom-input"
-                  placeholder="e.g. 25.5"
-                  value={newWeight}
-                  onChange={(e) => setNewWeight(e.target.value)}
-                  required
-                  style={{ paddingLeft: '16px' }}
-                />
+              {/* Item Photo Upload */}
+              <div style={{ marginTop: '14px' }}>
+                <label className="input-label">Item Photo (Select from Gallery or Camera)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginTop: '6px' }}>
+                  <label className="btn-outline" style={{ cursor: 'pointer', padding: '10px 16px', fontSize: '0.85rem' }}>
+                    <Camera size={16} />
+                    <span>Upload / Capture Item Photo</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={(e) => handlePhotoUpload(e, setItemPhoto)}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                  {itemPhoto && (
+                    <img 
+                      src={itemPhoto} 
+                      alt="Item Preview" 
+                      style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--gold-primary)' }} 
+                    />
+                  )}
+                </div>
               </div>
-
-              {/* Vault Locker Number */}
-              <div className="input-group">
-                <label className="input-label">Vault Locker Tag *</label>
-                <input
-                  type="text"
-                  className="custom-input"
-                  placeholder="e.g. V-01"
-                  value={newVaultLocker}
-                  onChange={(e) => setNewVaultLocker(e.target.value)}
-                  required
-                  style={{ paddingLeft: '16px' }}
-                />
-              </div>
-
-              {/* Monthly Interest Rate */}
-              <div className="input-group">
-                <label className="input-label">Monthly Interest Rate (%) *</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  className="custom-input"
-                  placeholder="e.g. 1.5"
-                  value={newInterestRate}
-                  onChange={(e) => setNewInterestRate(e.target.value)}
-                  required
-                  style={{ paddingLeft: '16px' }}
-                />
-              </div>
-
-              {/* Loan Amount */}
-              <div className="input-group">
-                <label className="input-label">Loan Amount Sanctioned (₹) *</label>
-                <input
-                  type="number"
-                  className="custom-input"
-                  placeholder="e.g. 150000"
-                  value={newLoanAmount}
-                  onChange={(e) => setNewLoanAmount(e.target.value)}
-                  required
-                  style={{ paddingLeft: '16px', fontSize: '1.1rem', fontWeight: '700', color: 'var(--gold-light)' }}
-                />
-              </div>
-
             </div>
 
-            {/* Item Description */}
-            <div className="input-group" style={{ marginTop: '8px' }}>
-              <label className="input-label">Item Description & Hallmark Marks *</label>
-              <textarea
-                className="custom-input"
-                placeholder="Describe ornament (e.g. 22K Gold Bangle with Hallmark stamp)"
-                rows={3}
-                value={newItemDesc}
-                onChange={(e) => setNewItemDesc(e.target.value)}
-                required
-                style={{ paddingLeft: '16px', paddingTop: '12px', height: 'auto' }}
-              />
-            </div>
-
-            <button type="submit" className="btn-gold" style={{ width: '100%', marginTop: '16px' }}>
+            <button type="submit" className="btn-gold" style={{ width: '100%', marginTop: '10px' }}>
               <PlusCircle size={20} />
-              Save Girvi Loan Entry
+              Save Girvi Loan Entry & Generate Receipt
             </button>
           </form>
         </div>
@@ -585,13 +887,12 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(229, 193, 88, 0.2)', color: 'var(--gold-primary)', height: '40px' }}>
-                    <th style={{ padding: '12px 14px' }}>Girvi ID</th>
+                    <th style={{ padding: '12px 14px' }}>Pledge ID</th>
                     <th style={{ padding: '12px 14px' }}>Customer Name</th>
-                    <th style={{ padding: '12px 14px' }}>Metal & Purity</th>
-                    <th style={{ padding: '12px 14px' }}>Weight</th>
+                    <th style={{ padding: '12px 14px' }}>Article & Wt</th>
+                    <th style={{ padding: '12px 14px' }}>Net Wt</th>
                     <th style={{ padding: '12px 14px' }}>Loan Amount</th>
-                    <th style={{ padding: '12px 14px' }}>Interest</th>
-                    <th style={{ padding: '12px 14px' }}>Locker</th>
+                    <th style={{ padding: '12px 14px' }}>Loan in Words</th>
                     <th style={{ padding: '12px 14px' }}>Status</th>
                     <th style={{ padding: '12px 14px', textAlign: 'right' }}>Actions</th>
                   </tr>
@@ -599,19 +900,25 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                 <tbody>
                   {filteredGirvis.map((g) => (
                     <tr key={g.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', transition: 'background 0.2s ease' }} className="table-row-hover">
-                      <td style={{ padding: '14px', fontWeight: 700, color: 'var(--gold-light)' }}>{g.id}</td>
+                      <td style={{ padding: '14px', fontWeight: 700, color: 'var(--gold-light)' }}>
+                        <div>{g.id}</div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{g.pledgeDate || g.date}</div>
+                      </td>
                       <td style={{ padding: '14px' }}>
-                        <div style={{ fontWeight: 600, color: '#ffffff' }}>{g.customerName}</div>
+                        <div style={{ fontWeight: 600, color: '#ffffff' }}>
+                          {g.customerName} {g.relationType && g.relationName ? `(${g.relationType} ${g.relationName})` : ''}
+                        </div>
                         <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>+91 {g.mobile}</div>
                       </td>
                       <td style={{ padding: '14px', color: '#e2e8f0' }}>
-                        <div>{g.itemDescription}</div>
-                        <span className="badge-gold" style={{ fontSize: '0.68rem' }}>{g.metal} ({g.purity})</span>
+                        <div>{g.articleName || g.itemDescription}</div>
+                        <span className="badge-gold" style={{ fontSize: '0.68rem' }}>{g.metal} ({g.quantity || 1} Pcs)</span>
                       </td>
                       <td style={{ padding: '14px', fontWeight: 600, color: 'var(--gold-primary)' }}>{g.weight}</td>
                       <td style={{ padding: '14px', fontWeight: 700, color: '#ffffff' }}>₹{Number(g.loanAmount).toLocaleString('en-IN')}</td>
-                      <td style={{ padding: '14px', color: 'var(--text-gold)' }}>{g.interestRate}/mo</td>
-                      <td style={{ padding: '14px', color: 'var(--gold-light)', fontWeight: 600 }}>{g.vaultLocker}</td>
+                      <td style={{ padding: '14px', color: '#6ee7b7', fontSize: '0.78rem', maxWidth: '180px' }}>
+                        {g.loanAmountInWords || numberToWordsINR(g.loanAmount)}
+                      </td>
                       <td style={{ padding: '14px' }}>
                         {g.status === 'ACTIVE' ? (
                           <span className="badge-gold">ACTIVE</span>
