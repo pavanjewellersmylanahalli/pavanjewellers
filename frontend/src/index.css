@@ -458,3 +458,30 @@ input[type=number] {
     padding: 40px 24px;
   }
 }
+
+/* Fixed Footer */
+.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 80;
+  background: rgba(15, 5, 8, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  text-align: center;
+  padding: 10px 16px;
+  border-top: 1px solid rgba(229, 193, 88, 0.2);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.3px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 480px) {
+  .fixed-footer {
+    font-size: 0.7rem;
+    padding: 8px 12px;
+  }
+}
+

@@ -107,20 +107,7 @@ export default function App() {
       </div>
 
       {/* Fixed Footer */}
-      <footer style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 40,
-        background: 'rgba(15, 5, 8, 0.94)',
-        backdropFilter: 'blur(10px)',
-        textAlign: 'center',
-        padding: '10px 16px',
-        borderTop: '1px solid rgba(229, 193, 88, 0.15)',
-        color: 'var(--text-muted)',
-        fontSize: '0.78rem'
-      }}>
+      <footer className="fixed-footer">
         © 2026 Pavan Jewellers Girvi Management Portal. Built for Render (Backend) + Vercel (Frontend) + Supabase (Database).
       </footer>
     </div>
