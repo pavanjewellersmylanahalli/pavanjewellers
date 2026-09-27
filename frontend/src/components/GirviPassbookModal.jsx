@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   X, BookOpen, Plus, DollarSign, Calendar, FileText, ArrowDownRight, 
-  ArrowUpRight, Coins, Printer, Trash2, CheckCircle2, AlertCircle, Scale, User
+  ArrowUpRight, Coins, Printer, Trash2, CheckCircle2, AlertCircle, Scale, User, Save
 } from 'lucide-react';
 
 export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
@@ -37,7 +37,7 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
     e.preventDefault();
     const parsedAmt = parseFloat(amount);
     if (isNaN(parsedAmt) || parsedAmt <= 0) {
-      alert('Please enter a valid valid transaction amount');
+      alert('Please enter a valid transaction amount');
       return;
     }
 
@@ -109,13 +109,14 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
     <div style={{
       position: 'fixed',
       inset: 0,
-      background: 'rgba(5, 2, 4, 0.85)',
+      background: 'rgba(5, 2, 4, 0.88)',
       backdropFilter: 'blur(8px)',
+      WebkitBackdropFilter: 'blur(8px)',
       zIndex: 1100,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '16px'
+      padding: '10px 8px'
     }}>
       {/* Print-specific style override */}
       <style>{`
@@ -131,6 +132,7 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
             box-shadow: none !important;
             background: #ffffff !important;
             color: #000000 !important;
+            padding: 0 !important;
           }
           .no-print { display: none !important; }
           .print-dark-text { color: #000000 !important; }
@@ -139,124 +141,125 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
 
       <div className="glass-card passbook-modal-container" style={{
         width: '100%',
-        maxWidth: '840px',
-        maxHeight: '92vh',
+        maxWidth: '860px',
+        maxHeight: '94vh',
         overflowY: 'auto',
         borderRadius: '20px',
-        padding: '24px',
+        padding: '18px 16px',
         border: '1.5px solid rgba(229, 193, 88, 0.4)',
         background: 'rgba(15, 5, 8, 0.96)',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)'
       }}>
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '14px', borderBottom: '1px solid rgba(229, 193, 88, 0.2)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(229, 193, 88, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold-primary)' }}>
-              <BookOpen size={22} />
+        
+        {/* Header Bar */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(229, 193, 88, 0.2)', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(229, 193, 88, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold-primary)', flexShrink: 0 }}>
+              <BookOpen size={20} />
             </div>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h3 className="gold-text" style={{ fontSize: '1.4rem', fontWeight: 800 }}>Pledge Passbook Ledger</h3>
-                <span className="badge-gold">No. {girvi.id}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <h3 className="gold-text" style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0 }}>Pledge Passbook</h3>
+                <span className="badge-gold" style={{ fontSize: '0.7rem' }}>No. {girvi.id}</span>
               </div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>Detailed Transaction & Payment History Book</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: '2px 0 0 0' }}>Transaction Ledger & History Book</p>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }} className="no-print">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }} className="no-print">
             <button
               className="btn-gold"
               onClick={handlePrintPassbook}
-              style={{ padding: '6px 14px', fontSize: '0.82rem', minHeight: '36px' }}
+              style={{ padding: '6px 12px', fontSize: '0.78rem', minHeight: '36px' }}
             >
-              <Printer size={15} />
-              <span>Print Book</span>
+              <Printer size={14} />
+              <span>Print</span>
             </button>
             <button
               onClick={onClose}
-              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px' }}
+              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '10px', color: '#ffffff', cursor: 'pointer', padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <X size={22} />
+              <X size={20} />
             </button>
           </div>
         </div>
 
         {/* Customer & Article Info Banner */}
-        <div style={{ background: 'rgba(229, 193, 88, 0.08)', borderRadius: '14px', padding: '16px 20px', marginBottom: '20px', border: '1px solid rgba(229, 193, 88, 0.2)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', fontSize: '0.86rem' }}>
+        <div style={{ background: 'rgba(229, 193, 88, 0.08)', borderRadius: '14px', padding: '12px 14px', marginBottom: '16px', border: '1px solid rgba(229, 193, 88, 0.2)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', fontSize: '0.82rem' }}>
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600 }}>CUSTOMER NAME</div>
-              <div style={{ fontWeight: 800, color: '#ffffff', fontSize: '1rem', marginTop: '2px' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 700 }}>CUSTOMER NAME</div>
+              <div style={{ fontWeight: 800, color: '#ffffff', fontSize: '0.94rem', marginTop: '1px' }}>
                 {girvi.customerName} {girvi.relationType && girvi.relationName ? `(${girvi.relationType} ${girvi.relationName})` : ''}
               </div>
-              <div style={{ color: 'var(--text-gold)', fontSize: '0.8rem', marginTop: '2px' }}>📞 +91 {girvi.mobile}</div>
+              <div style={{ color: 'var(--text-gold)', fontSize: '0.78rem', marginTop: '1px' }}>📞 +91 {girvi.mobile}</div>
             </div>
 
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600 }}>ARTICLE & WEIGHT</div>
-              <div style={{ fontWeight: 700, color: '#ffffff', marginTop: '2px' }}>{girvi.articleName || girvi.itemDescription}</div>
-              <div style={{ color: 'var(--gold-primary)', fontWeight: 700, fontSize: '0.82rem', marginTop: '2px' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 700 }}>ARTICLE & WEIGHT</div>
+              <div style={{ fontWeight: 700, color: '#ffffff', marginTop: '1px' }}>{girvi.articleName || girvi.itemDescription}</div>
+              <div style={{ color: 'var(--gold-primary)', fontWeight: 700, fontSize: '0.78rem', marginTop: '1px' }}>
                 {girvi.metal} | Net Wt: {girvi.weight}
               </div>
             </div>
 
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600 }}>PLEDGE DATE & INTEREST RATE</div>
-              <div style={{ fontWeight: 700, color: '#ffffff', marginTop: '2px' }}>{girvi.pledgeDate || girvi.date}</div>
-              <div style={{ color: '#34d399', fontWeight: 700, fontSize: '0.82rem', marginTop: '2px' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 700 }}>PLEDGE DATE & INTEREST RATE</div>
+              <div style={{ fontWeight: 700, color: '#ffffff', marginTop: '1px' }}>{girvi.pledgeDate || girvi.date}</div>
+              <div style={{ color: '#34d399', fontWeight: 700, fontSize: '0.78rem', marginTop: '1px' }}>
                 Rate: {girvi.monthlyInterestRate || '2'}% Monthly
               </div>
             </div>
           </div>
         </div>
 
-        {/* Financial Summary Metric Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px', marginBottom: '24px' }}>
-          <div style={{ background: 'rgba(10, 3, 6, 0.6)', padding: '12px 14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Original Sanctioned</div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginTop: '2px' }}>
+        {/* Financial Summary Metric Cards (Responsive 2x2 on Mobile) */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px', marginBottom: '18px' }}>
+          <div style={{ background: 'rgba(10, 3, 6, 0.6)', padding: '10px 12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>Sanctioned Loan</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff', marginTop: '2px' }}>
               ₹{initialPrincipal.toLocaleString('en-IN')}
             </div>
           </div>
 
-          <div style={{ background: 'rgba(16, 185, 129, 0.08)', padding: '12px 14px', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
-            <div style={{ fontSize: '0.75rem', color: '#6ee7b7' }}>Current Outstanding Principal</div>
-            <div style={{ fontSize: '1.35rem', fontWeight: 900, color: '#34d399', marginTop: '2px' }}>
+          <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '10px 12px', borderRadius: '12px', border: '1.5px solid rgba(16, 185, 129, 0.35)' }}>
+            <div style={{ fontSize: '0.7rem', color: '#6ee7b7', fontWeight: 700 }}>Outstanding Loan</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#34d399', marginTop: '2px' }}>
               ₹{currentPrincipal.toLocaleString('en-IN')}
             </div>
           </div>
 
-          <div style={{ background: 'rgba(229, 193, 88, 0.08)', padding: '12px 14px', borderRadius: '12px', border: '1px solid rgba(229, 193, 88, 0.25)' }}>
-            <div style={{ fontSize: '0.75rem', color: 'var(--gold-light)' }}>Total Interest Collected</div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--gold-primary)', marginTop: '2px' }}>
+          <div style={{ background: 'rgba(229, 193, 88, 0.1)', padding: '10px 12px', borderRadius: '12px', border: '1px solid rgba(229, 193, 88, 0.25)' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--gold-light)', fontWeight: 600 }}>Interest Paid</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--gold-primary)', marginTop: '2px' }}>
               ₹{totalInterestCollected.toLocaleString('en-IN')}
             </div>
           </div>
 
-          <div style={{ background: 'rgba(168, 85, 247, 0.08)', padding: '12px 14px', borderRadius: '12px', border: '1px solid rgba(168, 85, 247, 0.25)' }}>
-            <div style={{ fontSize: '0.75rem', color: '#c084fc' }}>Total Top-Ups Given</div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#c084fc', marginTop: '2px' }}>
+          <div style={{ background: 'rgba(168, 85, 247, 0.1)', padding: '10px 12px', borderRadius: '12px', border: '1px solid rgba(168, 85, 247, 0.25)' }}>
+            <div style={{ fontSize: '0.7rem', color: '#c084fc', fontWeight: 600 }}>Top-Ups Given</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#c084fc', marginTop: '2px' }}>
               +₹{totalTopups.toLocaleString('en-IN')}
             </div>
           </div>
         </div>
 
         {/* Add New Transaction Entry Section (No Print) */}
-        <div className="no-print" style={{ background: 'rgba(10, 3, 6, 0.8)', padding: '18px', borderRadius: '16px', marginBottom: '24px', border: '1px solid rgba(229, 193, 88, 0.3)' }}>
-          <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--gold-light)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Plus size={18} color="var(--gold-primary)" /> Record New Transaction Entry
+        <div className="no-print" style={{ background: 'rgba(10, 3, 6, 0.8)', padding: '14px', borderRadius: '14px', marginBottom: '18px', border: '1px solid rgba(229, 193, 88, 0.3)' }}>
+          <h4 style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--gold-light)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Plus size={16} color="var(--gold-primary)" /> Record Transaction Entry
           </h4>
 
           <form onSubmit={handleAddTransaction}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', marginBottom: '10px' }}>
               {/* Type Select */}
-              <div>
-                <label className="input-label" style={{ fontSize: '0.78rem' }}>Transaction Type</label>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label className="input-label" style={{ fontSize: '0.75rem' }}>Transaction Type</label>
                 <select
                   className="custom-input"
                   value={transType}
                   onChange={(e) => setTransType(e.target.value)}
-                  style={{ padding: '8px 12px', fontSize: '0.85rem' }}
+                  style={{ padding: '8px 10px', fontSize: '0.85rem', width: '100%', minHeight: '40px' }}
                 >
                   <option value="INTEREST">💸 Interest Payment Received</option>
                   <option value="TOPUP">➕ Top-Up Loan Cash Given (+Principal)</option>
@@ -266,7 +269,7 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
 
               {/* Amount */}
               <div>
-                <label className="input-label" style={{ fontSize: '0.78rem' }}>Amount (₹)</label>
+                <label className="input-label" style={{ fontSize: '0.75rem' }}>Amount (₹)</label>
                 <input
                   type="number"
                   className="custom-input"
@@ -274,69 +277,70 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   required
-                  style={{ padding: '8px 12px', fontSize: '0.85rem' }}
+                  style={{ padding: '8px 10px', fontSize: '0.85rem', width: '100%', minHeight: '40px' }}
                 />
               </div>
 
               {/* Date */}
               <div>
-                <label className="input-label" style={{ fontSize: '0.78rem' }}>Transaction Date</label>
+                <label className="input-label" style={{ fontSize: '0.75rem' }}>Transaction Date</label>
                 <input
                   type="date"
                   className="custom-input"
                   value={transDate}
                   onChange={(e) => setTransDate(e.target.value)}
                   required
-                  style={{ padding: '8px 12px', fontSize: '0.85rem' }}
+                  style={{ padding: '8px 10px', fontSize: '0.85rem', width: '100%', minHeight: '40px' }}
                 />
               </div>
 
               {/* Interest Months (if INTEREST type) */}
               {transType === 'INTEREST' && (
                 <div>
-                  <label className="input-label" style={{ fontSize: '0.78rem' }}>Interest Months</label>
+                  <label className="input-label" style={{ fontSize: '0.75rem' }}>Interest Period</label>
                   <input
                     type="text"
                     className="custom-input"
                     placeholder="e.g. 2 months"
                     value={periodMonths}
                     onChange={(e) => setPeriodMonths(e.target.value)}
-                    style={{ padding: '8px 12px', fontSize: '0.85rem' }}
+                    style={{ padding: '8px 10px', fontSize: '0.85rem', width: '100%', minHeight: '40px' }}
                   />
                 </div>
               )}
             </div>
 
             {/* Remarks / Notes */}
-            <div style={{ marginBottom: '14px' }}>
-              <label className="input-label" style={{ fontSize: '0.78rem' }}>Remarks / Notes (Optional)</label>
+            <div style={{ marginBottom: '12px' }}>
+              <label className="input-label" style={{ fontSize: '0.75rem' }}>Remarks / Notes (Optional)</label>
               <input
                 type="text"
                 className="custom-input"
-                placeholder="e.g. Received via UPI / Cash, paid interest up to Sept 2026..."
+                placeholder="e.g. Received via PhonePe, interest paid till Sept 2026..."
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
-                style={{ padding: '8px 12px', fontSize: '0.85rem' }}
+                style={{ padding: '8px 10px', fontSize: '0.85rem', width: '100%', minHeight: '40px' }}
               />
             </div>
 
             <button
               type="submit"
               className="btn-gold"
-              style={{ width: '100%', minHeight: '40px', fontSize: '0.88rem', fontWeight: 700 }}
+              style={{ width: '100%', minHeight: '42px', fontSize: '0.88rem', fontWeight: 800 }}
             >
-              <Plus size={16} /> Save Transaction to Passbook
+              <Save size={16} /> Save Transaction to Passbook
             </button>
           </form>
         </div>
 
-        {/* Transaction History Ledger Table */}
+        {/* Transaction History Ledger Section */}
         <div>
-          <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--gold-light)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <BookOpen size={18} color="var(--gold-primary)" /> Passbook Statement History
+          <h4 style={{ fontSize: '0.98rem', fontWeight: 800, color: 'var(--gold-light)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <BookOpen size={16} color="var(--gold-primary)" /> Passbook Statement History
           </h4>
 
-          <div style={{ overflowX: 'auto' }}>
+          {/* DESKTOP TABLE VIEW (Visible >= 768px) */}
+          <div className="passbook-desktop-view" style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(229, 193, 88, 0.3)', color: 'var(--gold-primary)' }}>
@@ -406,15 +410,90 @@ export default function GirviPassbookModal({ girvi, onClose, onUpdateGirvi }) {
                       </td>
                     </tr>
                   ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                      No interest or top-up payment transactions recorded yet. Use the form above to log transactions.
-                    </td>
-                  </tr>
-                )}
+                ) : null}
               </tbody>
             </table>
+          </div>
+
+          {/* MOBILE CARDS VIEW (Visible < 768px - Touch Friendly Timeline Cards) */}
+          <div className="passbook-mobile-view" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            
+            {/* Initial Loan Creation Mobile Card */}
+            <div style={{ background: 'rgba(10, 3, 6, 0.7)', borderRadius: '12px', border: '1px solid rgba(229, 193, 88, 0.3)', padding: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>{girvi.pledgeDate || girvi.date}</span>
+                <span className="badge-gold" style={{ fontSize: '0.66rem' }}>PLEDGE CREATED</span>
+              </div>
+              <div style={{ fontSize: '0.84rem', fontWeight: 600, color: '#ffffff', marginBottom: '8px' }}>
+                Original Mortgage Loan Sanctioned
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.04)', padding: '8px 10px', borderRadius: '8px' }}>
+                <div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Loan Issued</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#ffffff' }}>+₹{initialPrincipal.toLocaleString('en-IN')}</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Balance Loan</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 900, color: '#34d399' }}>₹{initialPrincipal.toLocaleString('en-IN')}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Dynamic Transactions Mobile Cards */}
+            {transactions.map((tx) => (
+              <div key={tx.id} style={{
+                background: 'rgba(10, 3, 6, 0.7)',
+                borderRadius: '12px',
+                border: tx.type === 'INTEREST' ? '1px solid rgba(16, 185, 129, 0.35)' : tx.type === 'TOPUP' ? '1px solid rgba(168, 85, 247, 0.35)' : '1px solid rgba(59, 130, 246, 0.35)',
+                padding: '12px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ffffff' }}>{tx.date}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {tx.type === 'INTEREST' && (
+                      <span className="badge-success" style={{ fontSize: '0.66rem' }}>INTEREST PAID</span>
+                    )}
+                    {tx.type === 'TOPUP' && (
+                      <span className="badge-gold" style={{ fontSize: '0.66rem', background: 'rgba(168, 85, 247, 0.2)', color: '#c084fc', borderColor: 'rgba(168, 85, 247, 0.4)' }}>LOAN TOP-UP</span>
+                    )}
+                    {tx.type === 'PRINCIPAL_PAYMENT' && (
+                      <span className="badge-gold" style={{ fontSize: '0.66rem', background: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.4)' }}>PRINCIPAL PAID</span>
+                    )}
+                    
+                    <button
+                      onClick={() => handleDeleteTransaction(tx.id)}
+                      style={{ background: 'rgba(239, 68, 68, 0.15)', border: 'none', borderRadius: '6px', color: '#fca5a5', cursor: 'pointer', padding: '4px 6px' }}
+                      title="Delete entry"
+                      className="no-print"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ fontSize: '0.84rem', color: '#e2e8f0', marginBottom: '8px' }}>
+                  {tx.remarks}
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.04)', padding: '8px 10px', borderRadius: '8px' }}>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Transaction Cash</div>
+                    <div style={{
+                      fontSize: '0.98rem',
+                      fontWeight: 800,
+                      color: tx.type === 'INTEREST' ? '#34d399' : tx.type === 'TOPUP' ? '#c084fc' : '#60a5fa'
+                    }}>
+                      {tx.type === 'TOPUP' ? `+₹${parseFloat(tx.amount).toLocaleString('en-IN')}` : `₹${parseFloat(tx.amount).toLocaleString('en-IN')}`}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Balance Loan</div>
+                    <div style={{ fontSize: '0.98rem', fontWeight: 900, color: '#34d399' }}>₹{currentPrincipal.toLocaleString('en-IN')}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+
           </div>
         </div>
       </div>

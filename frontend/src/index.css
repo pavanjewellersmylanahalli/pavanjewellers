@@ -453,17 +453,17 @@ input[type=number] {
   }
 }
 
-.ledger-mobile-view {
+.ledger-mobile-view, .passbook-mobile-view {
   display: none;
 }
 
 /* Tablet & Mobile (< 768px) */
 @media (max-width: 768px) {
-  .ledger-desktop-view {
+  .ledger-desktop-view, .passbook-desktop-view {
     display: none !important;
   }
 
-  .ledger-mobile-view {
+  .ledger-mobile-view, .passbook-mobile-view {
     display: block !important;
   }
 
