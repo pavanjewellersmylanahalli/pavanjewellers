@@ -96,13 +96,13 @@ app.post('/api/auth/send-otp', async (req, res) => {
 
         return res.json({
           success: true,
-          message: `OTP sent via Twilio to ${reg_mobile}`,
+          message: `Real Twilio OTP sent to ${reg_mobile}`,
           status: verification.status,
           isMock: false
         });
       } catch (err) {
         console.error('Twilio Verify error:', err.message);
-        // Fall back to standard mode if verify fails
+        return res.status(400).json({ error: `Twilio Error: ${err.message}` });
       }
     }
 
@@ -163,12 +163,6 @@ app.post('/api/auth/verify-otp', async (req, res) => {
     const formattedMobile = formatPhone(reg_mobile);
     const cleanedMobile = reg_mobile.replace(/\D/g, '');
 
-    // Allow universal test OTP 123456 in dev mode
-    if (otp === '123456') {
-      memoryOTPs.set(cleanedMobile, { otp: '123456', verified: true, expiresAt: Date.now() + 600000 });
-      return res.json({ success: true, message: 'OTP verified successfully' });
-    }
-
     // Option A: Twilio Verify Check
     if (twilioClient && verifyServiceSid) {
       try {
@@ -180,11 +174,18 @@ app.post('/api/auth/verify-otp', async (req, res) => {
           memoryOTPs.set(cleanedMobile, { otp, verified: true, expiresAt: Date.now() + 600000 });
           return res.json({ success: true, message: 'OTP verified via Twilio' });
         } else {
-          return res.status(400).json({ error: 'Invalid OTP code entered' });
+          return res.status(400).json({ error: 'Incorrect Twilio OTP code entered. Please check your SMS.' });
         }
       } catch (err) {
         console.error('Twilio Verification check error:', err.message);
+        return res.status(400).json({ error: `Twilio Verification Error: ${err.message}` });
       }
+    }
+
+    // Dev mode universal OTP fallback only if Twilio Verify is not active
+    if (otp === '123456') {
+      memoryOTPs.set(cleanedMobile, { otp: '123456', verified: true, expiresAt: Date.now() + 600000 });
+      return res.json({ success: true, message: 'OTP verified successfully (Dev mode)' });
     }
 
     // Option B: Memory check
