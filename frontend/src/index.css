@@ -743,18 +743,24 @@ input[type=number] {
   margin-top: 2px;
 }
 
+.statutory-notice-wrapper {
+  margin-top: 3px;
+  margin-bottom: 5px;
+}
+
 .statutory-notice {
   display: flex;
   justify-content: space-between;
   font-size: 0.76rem;
-  margin-top: 2px;
-  margin-bottom: 4px;
+  line-height: 1.25;
+  margin: 0;
 }
 
 .clause-text {
   font-size: 0.74rem;
   font-style: italic;
-  margin-bottom: 8px;
+  line-height: 1.25;
+  margin: 0;
 }
 
 /* Pawn Articles Table */
@@ -762,19 +768,19 @@ input[type=number] {
   width: 100%;
   border-collapse: collapse;
   border: 1.5px solid #000;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   margin-bottom: 8px;
 }
 
 .pawn-articles-table th,
 .pawn-articles-table td {
   border: 1px solid #000;
-  padding: 3px 6px;
+  padding: 4px 6px;
   vertical-align: middle;
 }
 
 .pawn-articles-table tbody tr {
-  height: 26px;
+  height: 36px;
 }
 
 .pawn-articles-table th {
@@ -1065,15 +1071,21 @@ input[type=number] {
     font-size: 0.86rem !important;
   }
 
+  .statutory-notice-wrapper {
+    margin-top: 2px !important;
+    margin-bottom: 4px !important;
+  }
+
   .statutory-notice {
     font-size: 0.72rem !important;
-    margin-top: 3px !important;
-    margin-bottom: 3px !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
   }
 
   .clause-text {
     font-size: 0.7rem !important;
-    margin-bottom: 6px !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
   }
 
   .pawn-articles-table {
@@ -1083,11 +1095,11 @@ input[type=number] {
   .pawn-articles-table th,
   .pawn-articles-table td {
     padding: 3px 5px !important;
-    font-size: 0.74rem !important;
+    font-size: 0.76rem !important;
   }
 
   .pawn-articles-table tbody tr {
-    height: 25px !important;
+    height: 34px !important;
   }
 
   .kannada-note-box {

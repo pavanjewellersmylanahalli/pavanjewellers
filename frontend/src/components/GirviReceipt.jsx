@@ -111,12 +111,14 @@ export default function GirviReceipt({ girvi, shop, onClose }) {
       </div>
 
       {/* Statutory Notice */}
-      <div className="statutory-notice">
-        <div>Rate of interest: <em>Fourteen percent per annum</em></div>
-        <div>Time of redemption: <em>12 months</em></div>
-      </div>
-      <div className="clause-text">
-        <em>The following article / articles is / are pawned with me / us</em>
+      <div className="statutory-notice-wrapper">
+        <div className="statutory-notice">
+          <div>Rate of interest: <em>Fourteen percent per annum</em></div>
+          <div>Time of redemption: <em>12 months</em></div>
+        </div>
+        <div className="clause-text">
+          <em>The following article / articles is / are pawned with me / us</em>
+        </div>
       </div>
 
       {/* Articles Table */}
