@@ -52,6 +52,45 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     }
   }, [girvis, storageKey]);
 
+  // Physical Vault Audit States
+  const auditStorageKey = `pavan_audit_checked_${shop?.id || shop?.login_mobile || 'default'}`;
+  const [checkedGirviIds, setCheckedGirviIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem(auditStorageKey);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const [auditMetalFilter, setAuditMetalFilter] = useState('Gold');
+  const [auditSearch, setAuditSearch] = useState('');
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(auditStorageKey, JSON.stringify(checkedGirviIds));
+    } catch (e) {
+      console.error('Failed to save audit checked state:', e);
+    }
+  }, [checkedGirviIds, auditStorageKey]);
+
+  const toggleCheckGirvi = (id) => {
+    setCheckedGirviIds(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const markAllAudit = (itemsToMark) => {
+    const idsToMark = itemsToMark.map(i => i.id);
+    setCheckedGirviIds(prev => Array.from(new Set([...prev, ...idsToMark])));
+  };
+
+  const resetAuditSession = () => {
+    if (window.confirm('Reset current physical vault audit progress for all items?')) {
+      setCheckedGirviIds([]);
+    }
+  };
+
   // Non-blocking background sync with Supabase / Backend database
   useEffect(() => {
     if (!shop?.id) return;
@@ -874,62 +913,308 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
         </div>
       )}
 
-      {/* ================= OPTION 6: GIRVI STOCK CHECK ================= */}
-      {activeTab === 'STOCK_CHECK' && (
-        <div style={{ marginBottom: '24px' }}>
-          <div className="glass-card" style={{ padding: '24px 28px', marginBottom: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '14px',
-                  background: 'rgba(229, 193, 88, 0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--gold-primary)'
-                }}>
-                  <PackageCheck size={26} />
+      {/* ================= OPTION 6: GIRVI STOCK CHECK (PHYSICAL VAULT AUDIT) ================= */}
+      {activeTab === 'STOCK_CHECK' && (() => {
+        // Filter active vault items by metal tab
+        let auditBaseItems = activeGirvis;
+        if (auditMetalFilter === 'Gold') {
+          auditBaseItems = activeGirvis.filter(i => i.metal === 'Gold');
+        } else if (auditMetalFilter === 'Silver') {
+          auditBaseItems = activeGirvis.filter(i => i.metal === 'Silver');
+        }
+
+        // Apply Search filter
+        if (auditSearch.trim()) {
+          const q = auditSearch.toLowerCase();
+          auditBaseItems = auditBaseItems.filter(i =>
+            i.id.toLowerCase().includes(q) ||
+            i.customerName.toLowerCase().includes(q) ||
+            i.mobile.includes(q) ||
+            (i.articleName && i.articleName.toLowerCase().includes(q))
+          );
+        }
+
+        const uncheckedList = auditBaseItems.filter(i => !checkedGirviIds.includes(i.id));
+        const checkedList = auditBaseItems.filter(i => checkedGirviIds.includes(i.id));
+
+        const totalAuditCount = auditBaseItems.length;
+        const checkedCount = checkedList.length;
+        const uncheckedCount = uncheckedList.length;
+
+        const checkedWeight = checkedList.reduce((sum, i) => sum + (parseFloat(i.weight) || 0), 0);
+        const uncheckedWeight = uncheckedList.reduce((sum, i) => sum + (parseFloat(i.weight) || 0), 0);
+
+        const auditPercent = totalAuditCount > 0 ? Math.round((checkedCount / totalAuditCount) * 100) : 0;
+
+        return (
+          <div style={{ marginBottom: '24px' }}>
+            {/* Header Banner */}
+            <div className="glass-card" style={{ padding: '24px 28px', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '14px',
+                    background: 'rgba(229, 193, 88, 0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--gold-primary)'
+                  }}>
+                    <PackageCheck size={26} />
+                  </div>
+                  <div>
+                    <h2 className="gold-text" style={{ fontSize: '1.75rem', fontWeight: 800 }}>
+                      Girvi Vault Stock Audit
+                    </h2>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+                      Interactive Physical Locker Verification (Gold & Silver Audit)
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="gold-text" style={{ fontSize: '1.75rem', fontWeight: 800 }}>
-                    Girvi Vault Stock Audit
-                  </h2>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-                    Physical Vault Lockers, Tags, Net Weight & Security Audit
-                  </p>
+
+                {/* Metal Selection Tabs & Actions */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '4px', background: 'rgba(10, 3, 6, 0.6)', padding: '4px', borderRadius: '12px', border: '1px solid rgba(229, 193, 88, 0.25)' }}>
+                    <button
+                      onClick={() => setAuditMetalFilter('Gold')}
+                      style={{
+                        background: auditMetalFilter === 'Gold' ? 'var(--gold-gradient)' : 'transparent',
+                        color: auditMetalFilter === 'Gold' ? '#1a080c' : 'var(--text-muted)',
+                        border: 'none', borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer'
+                      }}
+                    >
+                      🥇 Gold Vault
+                    </button>
+                    <button
+                      onClick={() => setAuditMetalFilter('Silver')}
+                      style={{
+                        background: auditMetalFilter === 'Silver' ? 'linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%)' : 'transparent',
+                        color: auditMetalFilter === 'Silver' ? '#1a080c' : 'var(--text-muted)',
+                        border: 'none', borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer'
+                      }}
+                    >
+                      🥈 Silver Vault
+                    </button>
+                    <button
+                      onClick={() => setAuditMetalFilter('ALL')}
+                      style={{
+                        background: auditMetalFilter === 'ALL' ? 'rgba(255,255,255,0.2)' : 'transparent',
+                        color: auditMetalFilter === 'ALL' ? '#ffffff' : 'var(--text-muted)',
+                        border: 'none', borderRadius: '8px', padding: '6px 14px', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer'
+                      }}
+                    >
+                      📦 All Vault Items
+                    </button>
+                  </div>
+
+                  <button
+                    className="btn-outline"
+                    onClick={() => markAllAudit(uncheckedList)}
+                    style={{ padding: '6px 12px', fontSize: '0.8rem', minHeight: '36px', color: '#34d399', borderColor: 'rgba(16, 185, 129, 0.4)' }}
+                    title="Mark all pending items as checked"
+                  >
+                    <CheckCircle2 size={16} />
+                    <span>Check All</span>
+                  </button>
+
+                  <button
+                    className="btn-outline"
+                    onClick={resetAuditSession}
+                    style={{ padding: '6px 12px', fontSize: '0.8rem', minHeight: '36px', color: '#fca5a5', borderColor: 'rgba(239, 68, 68, 0.4)' }}
+                    title="Reset audit checklist"
+                  >
+                    <RefreshCw size={14} />
+                    <span>Reset Audit</span>
+                  </button>
                 </div>
               </div>
 
-              <button className="btn-gold" onClick={() => alert(`Vault Audit Complete! Total ${activeGirvis.length} active items verified in lockers.`)}>
-                <CheckCircle2 size={18} />
-                Run Physical Vault Audit
-              </button>
+              {/* Audit Progress Bar */}
+              <div style={{ marginTop: '20px', background: 'rgba(10, 3, 6, 0.5)', padding: '14px 18px', borderRadius: '14px', border: '1px solid rgba(229, 193, 88, 0.2)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontSize: '0.88rem', fontWeight: 700, flexWrap: 'wrap', gap: '8px' }}>
+                  <span style={{ color: 'var(--gold-light)' }}>
+                    Physical Audit Progress: <strong style={{ color: '#34d399' }}>{checkedCount} / {totalAuditCount}</strong> items verified ({auditPercent}%)
+                  </span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                    Verified Weight: <strong style={{ color: 'var(--gold-primary)' }}>{checkedWeight.toFixed(2)}g</strong> | Remaining: <strong style={{ color: '#fca5a5' }}>{uncheckedWeight.toFixed(2)}g</strong>
+                  </span>
+                </div>
+                <div style={{ width: '100%', height: '10px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '5px', overflow: 'hidden' }}>
+                  <div style={{
+                    width: `${auditPercent}%`,
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #10b981 0%, #34d399 50%, #e5c158 100%)',
+                    transition: 'width 0.4s ease'
+                  }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Search Control */}
+            <div className="glass-card" style={{ padding: '14px 20px', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Search size={18} color="var(--gold-primary)" />
+                <input
+                  type="text"
+                  className="custom-input"
+                  placeholder="Type or Scan Pledge Number (e.g. 1234), Customer Name, or Phone to filter..."
+                  value={auditSearch}
+                  onChange={(e) => setAuditSearch(e.target.value)}
+                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '0.95rem', minHeight: 'auto' }}
+                />
+                {auditSearch && (
+                  <button onClick={() => setAuditSearch('')} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>✕</button>
+                )}
+              </div>
+            </div>
+
+            {/* TWO AUDIT TABLES (UNCHECKED vs CHECKED) */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '24px' }}>
+
+              {/* TABLE 1: UNCHECKED / PENDING AUDIT ITEMS */}
+              <div className="glass-card" style={{ padding: '20px', border: '1.5px solid rgba(239, 68, 68, 0.35)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingBottom: '10px', borderBottom: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444', boxShadow: '0 0 8px #ef4444' }} />
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fca5a5' }}>
+                      Unchecked / Pending ({uncheckedCount})
+                    </h3>
+                  </div>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700 }}>
+                    {uncheckedWeight.toFixed(2)}g remaining
+                  </span>
+                </div>
+
+                {uncheckedList.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {uncheckedList.map((item) => (
+                      <div key={item.id} style={{
+                        background: 'rgba(10, 3, 6, 0.6)',
+                        border: '1px solid rgba(239, 68, 68, 0.25)',
+                        borderRadius: '12px',
+                        padding: '12px 14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '12px',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <input
+                            type="checkbox"
+                            checked={false}
+                            onChange={() => toggleCheckGirvi(item.id)}
+                            style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#10b981' }}
+                          />
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--gold-light)' }}>No. {item.id}</span>
+                              <span className="badge-gold" style={{ fontSize: '0.65rem' }}>{item.metal}</span>
+                            </div>
+                            <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#ffffff', marginTop: '2px' }}>
+                              {item.customerName}
+                            </div>
+                            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                              {item.articleName} ({item.weight})
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          className="btn-gold"
+                          onClick={() => toggleCheckGirvi(item.id)}
+                          style={{ padding: '6px 12px', fontSize: '0.78rem', minHeight: '34px' }}
+                        >
+                          <CheckCircle size={14} />
+                          <span>Verify</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '32px 16px', color: 'var(--text-muted)' }}>
+                    <CheckCircle2 size={36} color="#34d399" style={{ opacity: 0.8, marginBottom: '8px' }} />
+                    <div style={{ fontSize: '0.95rem', color: '#6ee7b7', fontWeight: 700 }}>All Vault Items Verified!</div>
+                    <div style={{ fontSize: '0.78rem', marginTop: '2px' }}>Zero pending items remaining in unchecked table.</div>
+                  </div>
+                )}
+              </div>
+
+              {/* TABLE 2: CHECKED / VERIFIED AUDIT ITEMS */}
+              <div className="glass-card" style={{ padding: '20px', border: '1.5px solid rgba(16, 185, 129, 0.4)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingBottom: '10px', borderBottom: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#6ee7b7' }}>
+                      Checked / Verified ({checkedCount})
+                    </h3>
+                  </div>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700 }}>
+                    {checkedWeight.toFixed(2)}g verified
+                  </span>
+                </div>
+
+                {checkedList.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {checkedList.map((item) => (
+                      <div key={item.id} style={{
+                        background: 'rgba(16, 185, 129, 0.08)',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        borderRadius: '12px',
+                        padding: '12px 14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '12px',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <input
+                            type="checkbox"
+                            checked={true}
+                            onChange={() => toggleCheckGirvi(item.id)}
+                            style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#10b981' }}
+                          />
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--gold-light)' }}>No. {item.id}</span>
+                              <span className="badge-success" style={{ fontSize: '0.65rem' }}>VERIFIED</span>
+                            </div>
+                            <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#ffffff', marginTop: '2px' }}>
+                              {item.customerName}
+                            </div>
+                            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                              {item.articleName} ({item.weight})
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          className="btn-outline"
+                          onClick={() => toggleCheckGirvi(item.id)}
+                          style={{ padding: '6px 10px', fontSize: '0.75rem', minHeight: '34px', color: '#fca5a5', borderColor: 'rgba(239, 68, 68, 0.4)' }}
+                          title="Uncheck and return to pending list"
+                        >
+                          Undo
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '32px 16px', color: 'var(--text-muted)' }}>
+                    <AlertCircle size={36} style={{ opacity: 0.3, marginBottom: '8px' }} />
+                    <div style={{ fontSize: '0.9rem', color: '#ffffff' }}>No Checked Items Yet</div>
+                    <div style={{ fontSize: '0.78rem', marginTop: '2px' }}>Select gold/silver vault and check items from the left table to verify locker stock.</div>
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
-
-          <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '18px', marginBottom: '28px' }}>
-            <div className="glass-card" style={{ padding: '20px' }}>
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Active Vault Items</div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#34d399', marginTop: '4px' }}>{totalActiveCount} Items</div>
-              <div style={{ fontSize: '0.78rem', color: '#34d399' }}>Verified in Lockers</div>
-            </div>
-
-            <div className="glass-card" style={{ padding: '20px' }}>
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Total Vault Gold Weight</div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--gold-light)', marginTop: '4px' }}>{totalGoldWeight.toFixed(2)} g</div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Pawned Gold Ornaments</div>
-            </div>
-
-            <div className="glass-card" style={{ padding: '20px' }}>
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Total Vault Silver Weight</div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#e2e8f0', marginTop: '4px' }}>{totalSilverWeight.toFixed(2)} g</div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Pawned Silver Ornaments</div>
-            </div>
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* ================= TOTAL LEDGER OVERVIEW METRICS ================= */}
       {activeTab === 'TOTAL_LEDGER' && (
