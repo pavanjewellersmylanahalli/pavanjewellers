@@ -21,7 +21,7 @@ export default function GirviReceipt({ girvi, shop, onClose }) {
   const shopName = shop?.shop_name || 'PAVAN JEWELLERS';
   const shopMobile = shop?.login_mobile || shop?.reg_mobile || '9876543210';
   const shopAddress = shop?.address || 'Main Bazaar, Jewelers Market, Mylanahalli';
-  const initials = shopName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'PJ';
+  const initials = shopName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'PJB';
 
   const grossNum = parseFloat(girvi.grossWt) || 0;
   const grossGms = Math.floor(grossNum);
@@ -35,7 +35,7 @@ export default function GirviReceipt({ girvi, shop, onClose }) {
     <div className="pawn-ticket">
       {/* Top Bar */}
       <div className="ticket-top-bar">
-        <span className="form-f-text">FORM 'F' (SEE RULE 12) | PAWN TICKET | PBL NO. DRB/R/PB/2026-27</span>
+        <span className="form-f-text">FORM 'F' (SEE RULE 12) | PAWN TICKET | PBL NO. ...............</span>
         <span className="copy-type-label">{copyType}</span>
       </div>
 
@@ -46,7 +46,6 @@ export default function GirviReceipt({ girvi, shop, onClose }) {
           <h2 className="shop-title">{shopName.toUpperCase()}</h2>
           <div className="shop-subtitle">PAWN BROKERS</div>
           <div className="shop-address">{shopAddress}</div>
-          <div className="shop-contact">Mob: {shopMobile}</div>
         </div>
       </div>
 
