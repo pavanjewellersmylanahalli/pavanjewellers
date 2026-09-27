@@ -100,23 +100,51 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     }
   };
 
-  // Non-blocking background sync with Supabase / Backend database
-  useEffect(() => {
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const syncDatabase = () => {
     if (!shop?.id) return;
+    setIsSyncing(true);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
     fetch(`${apiBaseUrl}/api/girvis/${shop.id}`)
       .then(res => res.json())
       .then(data => {
-        if (data.success && Array.isArray(data.girvis) && data.girvis.length > 0) {
-          setGirvis(prev => {
-            const map = new Map();
-            prev.forEach(item => map.set(item.id, item));
-            data.girvis.forEach(item => map.set(item.id, item));
-            return Array.from(map.values());
-          });
+        if (data.success && Array.isArray(data.girvis)) {
+          setGirvis(data.girvis);
         }
       })
-      .catch(() => {});
+      .catch(err => console.error('Sync DB error:', err))
+      .finally(() => setIsSyncing(false));
+  };
+
+  // Real-time background sync with Supabase / Backend database (8s live polling + visibility change)
+  useEffect(() => {
+    if (!shop?.id) return;
+    syncDatabase();
+
+    const interval = setInterval(() => {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
+      fetch(`${apiBaseUrl}/api/girvis/${shop.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && Array.isArray(data.girvis)) {
+            setGirvis(data.girvis);
+          }
+        })
+        .catch(() => {});
+    }, 8000);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        syncDatabase();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [shop?.id]);
 
 
@@ -1472,6 +1500,17 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
+
+              {/* Sync DB Button */}
+              <button
+                className="btn-outline"
+                onClick={syncDatabase}
+                style={{ padding: '6px 12px', fontSize: '0.8rem', minHeight: '38px', color: 'var(--gold-primary)', borderColor: 'rgba(229, 193, 88, 0.35)' }}
+                title="Sync latest live records from database"
+              >
+                <RefreshCw size={14} className={isSyncing ? 'spin' : ''} />
+                <span>{isSyncing ? 'Syncing...' : 'Sync DB'}</span>
+              </button>
 
               {/* Status Filter */}
               {activeTab !== 'RELEASE_LEDGER' && (
