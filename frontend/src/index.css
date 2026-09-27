@@ -494,4 +494,415 @@ input[type=number] {
   to { transform: rotate(360deg); }
 }
 
+/* ================= PAWN TICKET RECEIPT & PRINT STYLES ================= */
+.receipt-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.receipt-modal-actions {
+  width: 100%;
+  max-width: 1280px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(20, 7, 13, 0.95);
+  border: 1px solid rgba(229, 193, 88, 0.3);
+  padding: 12px 20px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.receipt-dual-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  background: #ffffff;
+  color: #000000;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 1300px;
+  overflow-x: auto;
+  font-family: 'Times New Roman', Times, serif;
+}
+
+.pawn-ticket {
+  flex: 1;
+  min-width: 560px;
+  border: 2px solid #000000;
+  padding: 12px;
+  background: #ffffff;
+  color: #000000;
+  box-sizing: border-box;
+}
+
+.ticket-top-bar {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #333333;
+}
+
+.ticket-shop-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 8px;
+  border-bottom: 1.5px solid #000000;
+  padding-bottom: 6px;
+}
+
+.shop-logo-badge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #b88a28;
+  color: #b88a28;
+  font-family: 'Cinzel', serif;
+  font-weight: 800;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shop-info-center {
+  text-align: center;
+}
+
+.shop-title {
+  font-family: 'Times New Roman', serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  margin: 0;
+  color: #000000;
+}
+
+.shop-subtitle {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.shop-address, .shop-contact {
+  font-size: 0.7rem;
+  color: #222222;
+}
+
+.ticket-meta-bar {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.underline-text {
+  border-bottom: 1px solid #000;
+  padding: 0 8px;
+}
+
+/* Pawner Grid */
+.pawner-grid-container {
+  display: flex;
+  border: 1.5px solid #000000;
+  margin-bottom: 6px;
+}
+
+.pawner-details {
+  flex: 1;
+  border-right: 1.5px solid #000000;
+}
+
+.pawner-row {
+  display: flex;
+  border-bottom: 1px solid #000000;
+  padding: 3px 6px;
+  font-size: 0.76rem;
+}
+
+.pawner-row:last-child {
+  border-bottom: none;
+}
+
+.pawner-row .lbl {
+  width: 130px;
+  font-weight: 800;
+  color: #000000;
+}
+
+.pawner-row.split-row {
+  justify-content: space-between;
+}
+
+.photo-container-box {
+  width: 140px;
+  display: flex;
+}
+
+.photo-sub-box {
+  flex: 1;
+  border-right: 1px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 90px;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.photo-sub-box:last-child {
+  border-right: none;
+}
+
+.photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-lbl {
+  font-size: 0.62rem;
+  color: #3b82f6;
+  text-align: center;
+}
+
+/* Financial Box */
+.financial-grid-box {
+  display: flex;
+  border: 1.5px solid #000000;
+  margin-bottom: 6px;
+}
+
+.fin-box-left {
+  width: 170px;
+  border-right: 1px solid #000;
+  padding: 4px 6px;
+}
+
+.fin-box-right {
+  flex: 1;
+  padding: 4px 6px;
+}
+
+.fin-lbl {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #444;
+}
+
+.fin-val {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #000000;
+}
+
+.fin-words {
+  font-size: 0.9rem;
+  font-weight: 800;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.statutory-notice {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  margin-bottom: 2px;
+}
+
+.clause-text {
+  font-size: 0.72rem;
+  font-style: italic;
+  margin-bottom: 6px;
+}
+
+/* Pawn Articles Table */
+.pawn-articles-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1.5px solid #000;
+  font-size: 0.74rem;
+  margin-bottom: 6px;
+}
+
+.pawn-articles-table th, .pawn-articles-table td {
+  border: 1px solid #000;
+  padding: 3px 5px;
+  vertical-align: middle;
+}
+
+.pawn-articles-table th {
+  font-weight: 800;
+  background: #f5f5f5;
+  text-align: center;
+  font-size: 0.7rem;
+}
+
+.sub-th {
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid #000;
+  font-size: 0.62rem;
+  margin-top: 2px;
+}
+
+.wt-cell {
+  display: flex;
+  justify-content: space-around;
+  font-weight: 700;
+}
+
+.center-txt { text-align: center; }
+.bold-txt { font-weight: 800; }
+
+.kannada-note-box {
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border: 1.5px solid #000;
+  padding: 3px;
+  margin-bottom: 6px;
+}
+
+.summary-bar-grid {
+  display: flex;
+  border: 1.5px solid #000;
+  font-size: 0.82rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.summary-bar-grid > div {
+  flex: 1;
+  text-align: center;
+  padding: 3px;
+  border-right: 1px solid #000;
+}
+
+.summary-bar-grid > div:last-child {
+  border-right: none;
+}
+
+/* Signatures Grid */
+.signatures-grid-box {
+  display: flex;
+  gap: 10px;
+}
+
+.sig-box-left {
+  width: 45%;
+  border: 1.5px solid #000;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 85px;
+}
+
+.sig-box-right {
+  width: 55%;
+  border: 1.5px solid #000;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 85px;
+}
+
+.sig-header {
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.sig-dec-text {
+  font-size: 0.65rem;
+  color: #333333;
+  line-height: 1.2;
+}
+
+.sig-footer-line {
+  border-top: 1.5px solid #000;
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding-top: 3px;
+  margin-top: 16px;
+}
+
+/* Tear Line */
+.ticket-tear-line {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2px;
+}
+
+.dashed-line {
+  flex: 1;
+  width: 1px;
+  border-left: 2px dashed #666;
+}
+
+.tear-icon {
+  font-size: 0.68rem;
+  font-weight: 800;
+  writing-mode: vertical-rl;
+  letter-spacing: 2px;
+  color: #555;
+  margin: 10px 0;
+}
+
+/* PRINT STYLES */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .receipt-modal-backdrop,
+  .receipt-modal-backdrop * {
+    visibility: visible;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .receipt-modal-backdrop {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    background: transparent;
+    padding: 0;
+  }
+  .receipt-dual-wrapper {
+    box-shadow: none;
+    padding: 0;
+    max-width: 100%;
+  }
+  @page {
+    size: A4 landscape;
+    margin: 6mm;
+  }
+}
+
+
 

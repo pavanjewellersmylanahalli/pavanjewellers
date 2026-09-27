@@ -6,6 +6,8 @@ import {
   Camera, Upload, Calendar, User, FileText as DetailsIcon
 } from 'lucide-react';
 
+import GirviReceipt from './GirviReceipt';
+
 // Helper function to convert Indian Currency numbers to Words
 function numberToWordsINR(num) {
   if (!num || isNaN(num) || num <= 0) return '';
@@ -27,6 +29,7 @@ function numberToWordsINR(num) {
 export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
+  const [selectedGirviForPrint, setSelectedGirviForPrint] = useState(null);
 
   // Real Girvi items stored in LocalStorage for this shop
   const storageKey = `pavan_girvis_${shop?.id || shop?.login_mobile || 'default'}`;
@@ -256,7 +259,8 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     setLoanAmount('');
     setItemPhoto(null);
     
-    alert(`✅ New Girvi Entry ${newRecord.id} saved successfully!`);
+    // Automatically open Form 'F' Pawn Ticket receipt modal for printing
+    setSelectedGirviForPrint(newRecord);
     setActiveTab('TOTAL_LEDGER');
   };
 
@@ -970,8 +974,8 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                           <button
                             className="btn-outline"
                             style={{ padding: '4px 8px', fontSize: '0.75rem', minHeight: '32px' }}
-                            onClick={() => window.print()}
-                            title="Print Slip"
+                            onClick={() => setSelectedGirviForPrint(g)}
+                            title="Print Pawn Ticket (Form 'F')"
                           >
                             <Printer size={13} />
                           </button>
@@ -1004,6 +1008,15 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
             </div>
           )}
         </div>
+      )}
+
+      {/* Official Form 'F' Pawn Ticket Print Modal */}
+      {selectedGirviForPrint && (
+        <GirviReceipt
+          girvi={selectedGirviForPrint}
+          shop={shop}
+          onClose={() => setSelectedGirviForPrint(null)}
+        />
       )}
 
     </div>
