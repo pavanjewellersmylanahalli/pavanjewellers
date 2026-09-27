@@ -47,6 +47,12 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
     }
   };
 
+  const triggerPrewarm = () => {
+    if (apiBaseUrl) {
+      fetch(`${apiBaseUrl}/api/health`).catch(() => {});
+    }
+  };
+
   return (
     <div className="glass-card auth-card animate-fadeIn">
       {/* Title */}
@@ -93,7 +99,11 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
               placeholder="Enter Registered Mobile Number"
               maxLength={10}
               value={mobile}
-              onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
+              onFocus={triggerPrewarm}
+              onChange={(e) => {
+                triggerPrewarm();
+                setMobile(e.target.value.replace(/\D/g, ''));
+              }}
               required
             />
           </div>
@@ -113,9 +123,11 @@ export default function Login({ onLoginSuccess, onSwitchToRegister, apiBaseUrl }
               placeholder="Enter Security PIN"
               maxLength={6}
               value={pin}
+              onFocus={triggerPrewarm}
               onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
               required
             />
+
             {showPin ? (
               <EyeOff
                 className="input-action-icon"

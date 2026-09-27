@@ -49,6 +49,26 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     }
   }, [girvis, storageKey]);
 
+  // Non-blocking background sync with Supabase / Backend database
+  useEffect(() => {
+    if (!shop?.id) return;
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
+    fetch(`${apiBaseUrl}/api/girvis/${shop.id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.girvis) && data.girvis.length > 0) {
+          setGirvis(prev => {
+            const map = new Map();
+            prev.forEach(item => map.set(item.id, item));
+            data.girvis.forEach(item => map.set(item.id, item));
+            return Array.from(map.values());
+          });
+        }
+      })
+      .catch(() => {});
+  }, [shop?.id]);
+
+
   // Prevent mouse wheel scrolling from accidentally changing number inputs
   useEffect(() => {
     const handleWheel = () => {
@@ -210,6 +230,16 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
 
     setGirvis([newRecord, ...girvis]);
 
+    // Async background sync with Supabase backend (non-blocking)
+    if (shop?.id) {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
+      fetch(`${apiBaseUrl}/api/girvis`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shopId: shop.id, girvi: newRecord })
+      }).catch(() => {});
+    }
+
     // Reset Form
     setPledgeNumber(`GV-${Date.now().toString().slice(-6)}`);
     setCustomerName('');
@@ -229,6 +259,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     alert(`✅ New Girvi Entry ${newRecord.id} saved successfully!`);
     setActiveTab('TOTAL_LEDGER');
   };
+
 
   const handleReleaseGirvi = (id) => {
     if (window.confirm(`Are you sure you want to mark Girvi ${id} as RELEASED / SETTLED?`)) {

@@ -328,9 +328,9 @@ app.post('/api/auth/login', async (req, res) => {
     if (supabase) {
       const { data, error } = await supabase
         .from('shops')
-        .select('*')
+        .select('id, shop_name, login_mobile, reg_mobile, pin_hash, address')
         .eq('login_mobile', cleanedLoginMobile)
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
         shopData = data;
@@ -372,6 +372,47 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(500).json({ error: 'Internal server error during login' });
   }
 });
+
+// 5. GIRVI SYNC ENDPOINTS (Ultra-fast sync)
+app.get('/api/girvis/:shopId', async (req, res) => {
+  try {
+    const { shopId } = req.params;
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('girvis')
+        .select('*')
+        .eq('shop_id', shopId)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        return res.json({ success: true, girvis: data.map(d => d.data || d) });
+      }
+    }
+    return res.json({ success: true, girvis: [] });
+  } catch (err) {
+    return res.json({ success: true, girvis: [] });
+  }
+});
+
+app.post('/api/girvis', async (req, res) => {
+  try {
+    const { shopId, girvi } = req.body;
+    if (supabase && shopId && girvi) {
+      await supabase.from('girvis').upsert([{
+        id: girvi.id,
+        shop_id: shopId,
+        data: girvi,
+        status: girvi.status || 'ACTIVE',
+        metal: girvi.metal || 'Gold',
+        updated_at: new Date().toISOString()
+      }]);
+    }
+    return res.json({ success: true });
+  } catch (err) {
+    return res.json({ success: true });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Pavan Jewellers Backend server running on http://localhost:${PORT}`);

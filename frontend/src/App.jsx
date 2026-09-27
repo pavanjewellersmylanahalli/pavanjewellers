@@ -17,6 +17,16 @@ export default function App() {
   // Dynamic API Base URL (Uses Render URL in production, Vite proxy in dev)
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://pavan-jewellers-backend.onrender.com' : '');
 
+  // Pre-warm backend server immediately on app launch & keep-alive every 4 mins
+  useEffect(() => {
+    const prewarmBackend = () => {
+      fetch(`${apiBaseUrl}/api/health`).catch(() => {});
+    };
+    prewarmBackend();
+    const interval = setInterval(prewarmBackend, 4 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [apiBaseUrl]);
+
   // Load saved session on mount
   useEffect(() => {
     try {
@@ -31,6 +41,7 @@ export default function App() {
       console.error('Session load error:', err);
     }
   }, []);
+
 
   const handleLoginSuccess = (shopData, tokenData) => {
     setShop(shopData);
