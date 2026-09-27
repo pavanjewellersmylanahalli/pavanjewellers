@@ -896,11 +896,11 @@ input[type=number] {
   margin: 10px 0;
 }
 
-/* PRINT STYLES - Full A4 Landscape Vertical & Horizontal Utilization */
+/* PRINT STYLES - Perfectly Fitted A4 Landscape Single Sheet */
 @media print {
   @page {
     size: A4 landscape;
-    margin: 0 !important; /* Removes browser top/bottom headers, footers, timestamps & URLs */
+    margin: 2mm 3mm !important;
   }
 
   html,
@@ -934,7 +934,7 @@ input[type=number] {
     width: 100% !important;
     height: 100% !important;
     background: #ffffff !important;
-    padding: 4mm 5mm !important;
+    padding: 2mm 3mm !important;
     box-sizing: border-box !important;
     backdrop-filter: none !important;
   }
@@ -945,10 +945,11 @@ input[type=number] {
     margin: 0 auto !important;
     width: 100% !important;
     max-width: 100% !important;
-    height: 200mm !important; /* Fills full height of A4 Landscape (210mm page) */
+    height: 195mm !important;
+    max-height: 195mm !important;
     display: flex !important;
     flex-direction: row !important;
-    gap: 4mm !important;
+    gap: 3mm !important;
     background: #ffffff !important;
     box-sizing: border-box !important;
   }
@@ -959,161 +960,162 @@ input[type=number] {
     width: 48.5% !important;
     height: 100% !important;
     box-sizing: border-box !important;
-    padding: 12px 14px !important;
-    border: 2px solid #000000 !important;
+    padding: 6px 8px !important;
+    border: 1.8px solid #000000 !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
   }
 
   .ticket-top-bar {
-    font-size: 0.76rem !important;
-    margin-bottom: 8px !important;
+    font-size: 0.65rem !important;
+    margin-bottom: 3px !important;
   }
 
   .ticket-shop-banner {
-    margin-bottom: 10px !important;
-    padding-bottom: 8px !important;
+    margin-bottom: 4px !important;
+    padding-bottom: 4px !important;
   }
 
   .shop-logo-badge {
-    width: 46px !important;
-    height: 46px !important;
-    font-size: 1.15rem !important;
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 0.95rem !important;
   }
 
   .shop-title {
-    font-size: 1.55rem !important;
+    font-size: 1.25rem !important;
   }
 
   .shop-subtitle {
-    font-size: 0.82rem !important;
+    font-size: 0.68rem !important;
   }
 
   .shop-address,
   .shop-contact {
-    font-size: 0.78rem !important;
+    font-size: 0.65rem !important;
   }
 
   .ticket-meta-bar {
-    font-size: 1.05rem !important;
-    margin-bottom: 8px !important;
-  }
-
-  .pawner-grid-container {
-    margin-bottom: 8px !important;
-  }
-
-  .pawner-row {
-    padding: 6px 10px !important;
-    font-size: 0.86rem !important;
-  }
-
-  .pawner-row .lbl {
-    width: 145px !important;
-  }
-
-  .photo-container-box {
-    width: 160px !important;
-  }
-
-  .photo-sub-box {
-    height: 125px !important;
-  }
-
-  .photo-lbl {
-    font-size: 0.7rem !important;
-  }
-
-  .financial-grid-box {
-    margin-bottom: 8px !important;
-  }
-
-  .fin-box-left {
-    width: 200px !important;
-    padding: 6px 10px !important;
-  }
-
-  .fin-box-right {
-    padding: 6px 10px !important;
-  }
-
-  .fin-lbl {
-    font-size: 0.7rem !important;
-  }
-
-  .fin-val {
-    font-size: 1.45rem !important;
-  }
-
-  .fin-words {
-    font-size: 1.05rem !important;
-  }
-
-  .statutory-notice {
-    font-size: 0.82rem !important;
+    font-size: 0.88rem !important;
     margin-bottom: 4px !important;
   }
 
+  .pawner-grid-container {
+    margin-bottom: 4px !important;
+  }
+
+  .pawner-row {
+    padding: 2.5px 6px !important;
+    font-size: 0.74rem !important;
+  }
+
+  .pawner-row .lbl {
+    width: 125px !important;
+  }
+
+  .photo-container-box {
+    width: 130px !important;
+  }
+
+  .photo-sub-box {
+    height: 85px !important;
+  }
+
+  .photo-lbl {
+    font-size: 0.6rem !important;
+  }
+
+  .financial-grid-box {
+    margin-bottom: 4px !important;
+  }
+
+  .fin-box-left {
+    width: 160px !important;
+    padding: 3px 6px !important;
+  }
+
+  .fin-box-right {
+    padding: 3px 6px !important;
+  }
+
+  .fin-lbl {
+    font-size: 0.6rem !important;
+  }
+
+  .fin-val {
+    font-size: 1.15rem !important;
+  }
+
+  .fin-words {
+    font-size: 0.84rem !important;
+  }
+
+  .statutory-notice {
+    font-size: 0.7rem !important;
+    margin-bottom: 2px !important;
+  }
+
   .clause-text {
-    font-size: 0.8rem !important;
-    margin-bottom: 8px !important;
+    font-size: 0.68rem !important;
+    margin-bottom: 4px !important;
   }
 
   .pawn-articles-table {
-    margin-bottom: 8px !important;
+    margin-bottom: 4px !important;
   }
 
   .pawn-articles-table th,
   .pawn-articles-table td {
-    padding: 6px 8px !important;
-    font-size: 0.84rem !important;
+    padding: 2.5px 4px !important;
+    font-size: 0.72rem !important;
   }
 
   .pawn-articles-table tbody tr {
-    height: 38px !important;
+    height: 24px !important;
   }
 
   .kannada-note-box {
-    padding: 5px !important;
-    font-size: 0.92rem !important;
-    margin-bottom: 8px !important;
+    padding: 2.5px !important;
+    font-size: 0.78rem !important;
+    margin-bottom: 4px !important;
   }
 
   .summary-bar-grid {
-    font-size: 0.92rem !important;
-    margin-bottom: 10px !important;
+    font-size: 0.78rem !important;
+    margin-bottom: 4px !important;
   }
 
   .summary-bar-grid > div {
-    padding: 5px !important;
+    padding: 2.5px !important;
   }
 
   .signatures-grid-box {
-    gap: 12px !important;
+    gap: 8px !important;
   }
 
   .sig-box-left,
   .sig-box-right {
-    min-height: 125px !important;
-    padding: 8px 10px !important;
+    min-height: 75px !important;
+    padding: 4px 6px !important;
   }
 
   .sig-header {
-    font-size: 0.8rem !important;
+    font-size: 0.68rem !important;
   }
 
   .sig-dec-text {
-    font-size: 0.72rem !important;
+    font-size: 0.62rem !important;
+    line-height: 1.15 !important;
   }
 
   .sig-footer-line {
-    font-size: 0.72rem !important;
-    padding-top: 4px !important;
-    margin-top: 36px !important;
+    font-size: 0.64rem !important;
+    padding-top: 2px !important;
+    margin-top: 14px !important;
   }
 
   .ticket-tear-line {
-    width: 14px !important;
+    width: 10px !important;
   }
 }
