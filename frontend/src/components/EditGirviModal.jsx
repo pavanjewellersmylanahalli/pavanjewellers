@@ -298,6 +298,19 @@ export default function EditGirviModal({ girvi, onClose, onSave }) {
               />
             </div>
 
+            {/* Monthly Income */}
+            <div className="input-group" style={{ marginTop: '12px' }}>
+              <label className="input-label">Monthly Income (₹)</label>
+              <input
+                type="number"
+                className="custom-input"
+                placeholder="e.g. 50000"
+                value={monthlyIncome}
+                onChange={(e) => setMonthlyIncome(e.target.value)}
+                style={{ paddingLeft: '14px' }}
+              />
+            </div>
+
             {/* Customer Photo Upload & Camera */}
             <div style={{ marginTop: '12px' }}>
               <label className="input-label">Customer Photo</label>
@@ -344,10 +357,54 @@ export default function EditGirviModal({ girvi, onClose, onSave }) {
             </div>
           </div>
 
-          {/* SECTION 2: ARTICLE & ORNAMENT DETAILS */}
+          {/* SECTION 2: FINANCIAL & LOAN DETAILS */}
           <div style={{ background: 'rgba(10, 3, 6, 0.4)', border: '1px solid rgba(229, 193, 88, 0.2)', borderRadius: '16px', padding: '20px', marginBottom: '20px' }}>
             <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Coins size={16} /> Section 2: Article & Ornament Details
+              <DollarSign size={16} /> Section 2: Financial & Loan Details
+            </h4>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+              {/* Loan Amount */}
+              <div className="input-group">
+                <label className="input-label">Principal Loan Amount (₹) *</label>
+                <input
+                  type="number"
+                  className="custom-input"
+                  placeholder="e.g. 50000"
+                  value={loanAmount}
+                  onChange={(e) => setLoanAmount(e.target.value)}
+                  required
+                  style={{ paddingLeft: '14px' }}
+                />
+              </div>
+
+              {/* Monthly Interest Rate */}
+              <div className="input-group">
+                <label className="input-label">Monthly Interest Rate (%) *</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  className="custom-input"
+                  value={monthlyInterestRate}
+                  onChange={(e) => setMonthlyInterestRate(e.target.value)}
+                  required
+                  style={{ paddingLeft: '14px' }}
+                />
+              </div>
+            </div>
+
+            {/* Loan in Words preview */}
+            {loanAmountInWords && (
+              <div style={{ marginTop: '12px', padding: '10px 14px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '10px', color: '#6ee7b7', fontSize: '0.85rem', fontWeight: 700 }}>
+                💵 Loan Amount in Words: {loanAmountInWords}
+              </div>
+            )}
+          </div>
+
+          {/* SECTION 3: ARTICLE & ORNAMENT DETAILS */}
+          <div style={{ background: 'rgba(10, 3, 6, 0.4)', border: '1px solid rgba(229, 193, 88, 0.2)', borderRadius: '16px', padding: '20px', marginBottom: '24px' }}>
+            <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Coins size={16} /> Section 3: Article & Ornament Details
             </h4>
 
             {/* Metal Selector */}
@@ -505,50 +562,6 @@ export default function EditGirviModal({ girvi, onClose, onSave }) {
                 )}
               </div>
             </div>
-          </div>
-
-          {/* SECTION 3: FINANCIAL & LOAN DETAILS */}
-          <div style={{ background: 'rgba(10, 3, 6, 0.4)', border: '1px solid rgba(229, 193, 88, 0.2)', borderRadius: '16px', padding: '20px', marginBottom: '24px' }}>
-            <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <DollarSign size={16} /> Section 3: Financial & Loan Details
-            </h4>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
-              {/* Loan Amount */}
-              <div className="input-group">
-                <label className="input-label">Principal Loan Amount (₹) *</label>
-                <input
-                  type="number"
-                  className="custom-input"
-                  placeholder="e.g. 50000"
-                  value={loanAmount}
-                  onChange={(e) => setLoanAmount(e.target.value)}
-                  required
-                  style={{ paddingLeft: '14px' }}
-                />
-              </div>
-
-              {/* Monthly Interest Rate */}
-              <div className="input-group">
-                <label className="input-label">Monthly Interest Rate (%) *</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  className="custom-input"
-                  value={monthlyInterestRate}
-                  onChange={(e) => setMonthlyInterestRate(e.target.value)}
-                  required
-                  style={{ paddingLeft: '14px' }}
-                />
-              </div>
-            </div>
-
-            {/* Loan in Words preview */}
-            {loanAmountInWords && (
-              <div style={{ marginTop: '12px', padding: '10px 14px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '10px', color: '#6ee7b7', fontSize: '0.85rem', fontWeight: 700 }}>
-                💵 Loan Amount in Words: {loanAmountInWords}
-              </div>
-            )}
           </div>
 
           {/* Action Footer */}

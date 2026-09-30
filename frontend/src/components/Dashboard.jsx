@@ -732,20 +732,6 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                     style={{ paddingLeft: '16px' }}
                   />
                 </div>
-
-                {/* Monthly Income */}
-                <div className="input-group">
-                  <label className="input-label">Monthly Income (₹) *</label>
-                  <input
-                    type="number"
-                    className="custom-input"
-                    placeholder="e.g. 50000"
-                    value={monthlyIncome}
-                    onChange={(e) => setMonthlyIncome(e.target.value)}
-                    required
-                    style={{ paddingLeft: '16px' }}
-                  />
-                </div>
               </div>
 
               {/* Address */}
@@ -759,6 +745,20 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                   onChange={(e) => setAddress(e.target.value)}
                   required
                   style={{ paddingLeft: '16px', paddingTop: '10px', height: 'auto' }}
+                />
+              </div>
+
+              {/* Monthly Income */}
+              <div className="input-group" style={{ marginTop: '12px' }}>
+                <label className="input-label">Monthly Income (₹) *</label>
+                <input
+                  type="number"
+                  className="custom-input"
+                  placeholder="e.g. 50000"
+                  value={monthlyIncome}
+                  onChange={(e) => setMonthlyIncome(e.target.value)}
+                  required
+                  style={{ paddingLeft: '16px' }}
                 />
               </div>
 
@@ -825,7 +825,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
               </div>
             </div>
 
-            {/* SECTION 2: ARTICLE DETAILS */}
+            {/* SECTION 2: FINANCIALS & LOAN DETAILS */}
             <div style={{
               background: 'rgba(10, 3, 6, 0.4)',
               border: '1px solid rgba(229, 193, 88, 0.2)',
@@ -834,7 +834,51 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
               marginBottom: '24px'
             }}>
               <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <DetailsIcon size={18} /> Section 2: Article Details
+                <DollarSign size={18} /> Section 2: Financials & Loan Details
+              </h3>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+                {/* Loan Amount */}
+                <div className="input-group">
+                  <label className="input-label">Loan Amount Sanctioned (₹) *</label>
+                  <input
+                    type="number"
+                    className="custom-input"
+                    placeholder="e.g. 150000"
+                    value={loanAmount}
+                    onChange={(e) => setLoanAmount(e.target.value)}
+                    required
+                    style={{ paddingLeft: '16px', fontSize: '1.2rem', fontWeight: '800', color: 'var(--gold-light)' }}
+                  />
+                </div>
+              </div>
+
+              {/* Loan Amount in Words (Auto-filled) */}
+              <div className="input-group" style={{ marginTop: '12px' }}>
+                <div className="input-label">
+                  <span>Loan Amount in Words (Auto-filled)</span>
+                  <span className="badge-gold">INR Words</span>
+                </div>
+                <input
+                  type="text"
+                  className="custom-input"
+                  value={loanAmountInWords || 'Enter loan amount above...'}
+                  readOnly
+                  style={{ paddingLeft: '16px', background: 'rgba(16, 185, 129, 0.1)', color: '#6ee7b7', fontWeight: 700 }}
+                />
+              </div>
+            </div>
+
+            {/* SECTION 3: ARTICLE DETAILS */}
+            <div style={{
+              background: 'rgba(10, 3, 6, 0.4)',
+              border: '1px solid rgba(229, 193, 88, 0.2)',
+              borderRadius: '16px',
+              padding: '20px',
+              marginBottom: '24px'
+            }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <DetailsIcon size={18} /> Section 3: Article Details
               </h3>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
@@ -935,51 +979,6 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                     style={{ paddingLeft: '16px' }}
                   />
                 </div>
-              </div>
-            </div>
-
-            {/* SECTION 3: FINANCIALS & LOAN DETAILS */}
-            <div style={{
-              background: 'rgba(10, 3, 6, 0.4)',
-              border: '1px solid rgba(229, 193, 88, 0.2)',
-              borderRadius: '16px',
-              padding: '20px',
-              marginBottom: '24px'
-            }}>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <DollarSign size={18} /> Section 3: Financials & Loan Details
-              </h3>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
-                {/* Loan Amount */}
-                <div className="input-group">
-                  <label className="input-label">Loan Amount Sanctioned (₹) *</label>
-                  <input
-                    type="number"
-                    className="custom-input"
-                    placeholder="e.g. 150000"
-                    value={loanAmount}
-                    onChange={(e) => setLoanAmount(e.target.value)}
-                    required
-                    style={{ paddingLeft: '16px', fontSize: '1.2rem', fontWeight: '800', color: 'var(--gold-light)' }}
-                  />
-                </div>
-
-              </div>
-
-              {/* Loan Amount in Words (Auto-filled) */}
-              <div className="input-group" style={{ marginTop: '12px' }}>
-                <div className="input-label">
-                  <span>Loan Amount in Words (Auto-filled)</span>
-                  <span className="badge-gold">INR Words</span>
-                </div>
-                <input
-                  type="text"
-                  className="custom-input"
-                  value={loanAmountInWords || 'Enter loan amount above...'}
-                  readOnly
-                  style={{ paddingLeft: '16px', background: 'rgba(16, 185, 129, 0.1)', color: '#6ee7b7', fontWeight: 700 }}
-                />
               </div>
 
               {/* Item Photo Upload & Live Camera */}
