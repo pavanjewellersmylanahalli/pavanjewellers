@@ -84,6 +84,7 @@ function isPledgeIdInRange(itemId, fromStr, toStr) {
 
 export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('ID_ASC'); // Options: 'ID_ASC', 'ID_DESC', 'DATE_DESC', 'DATE_ASC'
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [selectedGirviForPrint, setSelectedGirviForPrint] = useState(null);
   const [selectedGirviForPassbook, setSelectedGirviForPassbook] = useState(null);
@@ -407,6 +408,23 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
         (i.articleName && String(i.articleName).toLowerCase().includes(q))
       ));
     }
+
+    // Sort items naturally based on sortOrder (Pledge ID Ascending / Descending or Date)
+    items = [...items].sort((a, b) => {
+      const idA = String(a?.id || '').trim();
+      const idB = String(b?.id || '').trim();
+
+      if (sortOrder === 'ID_ASC') {
+        return idA.localeCompare(idB, undefined, { numeric: true, sensitivity: 'base' });
+      } else if (sortOrder === 'ID_DESC') {
+        return idB.localeCompare(idA, undefined, { numeric: true, sensitivity: 'base' });
+      } else if (sortOrder === 'DATE_DESC') {
+        return new Date(b.pledgeDate || b.date || 0) - new Date(a.pledgeDate || a.date || 0);
+      } else if (sortOrder === 'DATE_ASC') {
+        return new Date(a.pledgeDate || a.date || 0) - new Date(b.pledgeDate || b.date || 0);
+      }
+      return 0;
+    });
 
     return items;
   };
@@ -1695,6 +1713,51 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                 <span>PDF Report</span>
               </button>
 
+              {/* Pledge ID Ascending / Descending Sort Filter */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(10, 3, 6, 0.5)', padding: '4px', borderRadius: '10px', border: '1px solid rgba(229, 193, 88, 0.2)' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--gold-light)', fontWeight: 700, paddingLeft: '6px', paddingRight: '2px' }}>Pledge ID:</span>
+                <button
+                  type="button"
+                  onClick={() => setSortOrder('ID_ASC')}
+                  style={{
+                    background: sortOrder === 'ID_ASC' ? 'var(--gold-gradient)' : 'transparent',
+                    color: sortOrder === 'ID_ASC' ? '#1a080c' : 'var(--text-muted)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '6px 10px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '3px'
+                  }}
+                  title="Sort by Pledge ID in Ascending order (Lowest → Highest)"
+                >
+                  Ascending (ASC ↑)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSortOrder('ID_DESC')}
+                  style={{
+                    background: sortOrder === 'ID_DESC' ? 'var(--gold-gradient)' : 'transparent',
+                    color: sortOrder === 'ID_DESC' ? '#1a080c' : 'var(--text-muted)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '6px 10px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '3px'
+                  }}
+                  title="Sort by Pledge ID in Descending order (Highest → Lowest)"
+                >
+                  Descending (DESC ↓)
+                </button>
+              </div>
+
               {/* Status Filter */}
               {activeTab !== 'RELEASE_LEDGER' && (
                 <div style={{ display: 'flex', gap: '4px', background: 'rgba(10, 3, 6, 0.5)', padding: '4px', borderRadius: '10px', border: '1px solid rgba(229, 193, 88, 0.2)' }}>
@@ -1729,7 +1792,18 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid rgba(229, 193, 88, 0.2)', color: 'var(--gold-primary)', height: '40px' }}>
-                      <th style={{ padding: '12px 14px' }}>Pledge ID</th>
+                      <th 
+                        onClick={() => setSortOrder(prev => prev === 'ID_ASC' ? 'ID_DESC' : 'ID_ASC')}
+                        style={{ padding: '12px 14px', cursor: 'pointer', userSelect: 'none' }}
+                        title="Click to toggle Pledge ID Ascending / Descending order"
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span>Pledge ID</span>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--gold-primary)', fontWeight: 800 }}>
+                            {sortOrder === 'ID_ASC' ? '▲ (ASC)' : sortOrder === 'ID_DESC' ? '▼ (DESC)' : '↕'}
+                          </span>
+                        </div>
+                      </th>
                       <th style={{ padding: '12px 14px' }}>Customer Name</th>
                       <th style={{ padding: '12px 14px' }}>Article & Wt</th>
                       <th style={{ padding: '12px 14px' }}>Net Wt</th>
