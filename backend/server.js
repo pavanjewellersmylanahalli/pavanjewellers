@@ -589,8 +589,8 @@ app.get('/api/girvis/:shopId', async (req, res) => {
 app.post('/api/girvis', async (req, res) => {
   try {
     const { shopId, girvi } = req.body;
-    if (supabase && shopId && girvi) {
-      const { error } = await supabase.from('girvis').upsert([{
+    if (supabase && shopId && girvi && girvi.id) {
+      const recordToSave = {
         id: String(girvi.id),
         shop_id: String(shopId),
         pledge_date: girvi.pledgeDate || null,
@@ -600,7 +600,6 @@ app.post('/api/girvis', async (req, res) => {
         relation_name: girvi.relationName || '',
         mobile: girvi.mobile || '',
         monthly_income: girvi.monthlyIncome ? Number(girvi.monthlyIncome) : 0,
-        aadhar_number: girvi.aadharNumber || girvi.aadhar_number || '',
         address: girvi.address || '',
         customer_photo: girvi.customerPhoto || null,
         metal: girvi.metal || 'Gold',
@@ -616,18 +615,34 @@ app.post('/api/girvis', async (req, res) => {
         status: girvi.status || 'ACTIVE',
         data: girvi,
         updated_at: new Date().toISOString()
-      }], { onConflict: 'id' });
+      };
+
+      if (girvi.aadharNumber || girvi.aadhar_number) {
+        recordToSave.aadhar_number = girvi.aadharNumber || girvi.aadhar_number;
+      }
+
+      let { error } = await supabase.from('girvis').upsert([recordToSave], { onConflict: 'id' });
+
+      // If missing column error in remote Supabase table, retry without explicit column
+      if (error && error.message && (error.message.includes('aadhar_number') || error.message.includes('column'))) {
+        console.warn('⚠️ Column aadhar_number missing in remote Supabase table, retrying without it...');
+        delete recordToSave.aadhar_number;
+        const retry = await supabase.from('girvis').upsert([recordToSave], { onConflict: 'id' });
+        error = retry.error;
+      }
 
       if (error) {
         console.error('Supabase Girvi save error:', error.message);
+        return res.status(500).json({ success: false, error: error.message });
       } else {
         console.log(`✅ Girvi entry ${girvi.id} saved to Supabase DB successfully.`);
+        return res.json({ success: true });
       }
     }
     return res.json({ success: true });
   } catch (err) {
     console.error('Girvi endpoint error:', err);
-    return res.json({ success: true });
+    return res.status(500).json({ success: false, error: err.message });
   }
 });
 

@@ -169,8 +169,18 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     fetch(`${apiBaseUrl}/api/girvis/${shop.id}`)
       .then(res => res.json())
       .then(data => {
-        if (data.success && Array.isArray(data.girvis)) {
-          setGirvis(data.girvis);
+        if (data.success && Array.isArray(data.girvis) && data.girvis.length > 0) {
+          setGirvis(prev => {
+            const currentList = Array.isArray(prev) ? prev : [];
+            const remoteMap = new Map(data.girvis.map(g => [String(g.id), g]));
+            const merged = [...data.girvis];
+            currentList.forEach(localItem => {
+              if (localItem && localItem.id && !remoteMap.has(String(localItem.id))) {
+                merged.push(localItem);
+              }
+            });
+            return merged;
+          });
         }
       })
       .catch(err => console.error('Sync DB error:', err))
@@ -187,8 +197,18 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
       fetch(`${apiBaseUrl}/api/girvis/${shop.id}`)
         .then(res => res.json())
         .then(data => {
-          if (data.success && Array.isArray(data.girvis)) {
-            setGirvis(data.girvis);
+          if (data.success && Array.isArray(data.girvis) && data.girvis.length > 0) {
+            setGirvis(prev => {
+              const currentList = Array.isArray(prev) ? prev : [];
+              const remoteMap = new Map(data.girvis.map(g => [String(g.id), g]));
+              const merged = [...data.girvis];
+              currentList.forEach(localItem => {
+                if (localItem && localItem.id && !remoteMap.has(String(localItem.id))) {
+                  merged.push(localItem);
+                }
+              });
+              return merged;
+            });
           }
         })
         .catch(() => {});
@@ -470,7 +490,13 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
       status: 'ACTIVE'
     };
 
-    setGirvis([newRecord, ...girvis]);
+    setGirvis(prev => {
+      const updated = [newRecord, ...(Array.isArray(prev) ? prev : [])];
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(updated));
+      } catch (err) {}
+      return updated;
+    });
 
     // Async background sync with Supabase backend (non-blocking)
     if (shop?.id) {
@@ -479,7 +505,16 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ shopId: shop.id, girvi: newRecord })
-      }).catch(() => {});
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          syncDatabase();
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to post girvi to backend:', err);
+      });
     }
 
     // Reset Form
@@ -772,14 +807,13 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
 
               {/* Monthly Income */}
               <div className="input-group" style={{ marginTop: '12px' }}>
-                <label className="input-label">Monthly Income (₹) *</label>
+                <label className="input-label">Monthly Income (₹)</label>
                 <input
                   type="number"
                   className="custom-input"
                   placeholder="e.g. 50000"
                   value={monthlyIncome}
                   onChange={(e) => setMonthlyIncome(e.target.value)}
-                  required
                   style={{ paddingLeft: '16px' }}
                 />
               </div>
