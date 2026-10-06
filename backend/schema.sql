@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS public.girvis (
     relation_name TEXT,
     mobile VARCHAR(15),
     monthly_income NUMERIC,
+    aadhar_number TEXT,
     address TEXT,
     customer_photo TEXT,
     metal TEXT NOT NULL DEFAULT 'Gold',

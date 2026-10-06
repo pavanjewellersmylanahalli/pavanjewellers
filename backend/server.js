@@ -600,6 +600,7 @@ app.post('/api/girvis', async (req, res) => {
         relation_name: girvi.relationName || '',
         mobile: girvi.mobile || '',
         monthly_income: girvi.monthlyIncome ? Number(girvi.monthlyIncome) : 0,
+        aadhar_number: girvi.aadharNumber || girvi.aadhar_number || '',
         address: girvi.address || '',
         customer_photo: girvi.customerPhoto || null,
         metal: girvi.metal || 'Gold',

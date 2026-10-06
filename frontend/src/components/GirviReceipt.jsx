@@ -65,6 +65,7 @@ export default function GirviReceipt({ girvi, shop, onClose }) {
           <div className="pawner-row split-row">
             <span><span className="lbl">MOB:</span> <strong>{girvi.mobile}</strong></span>
             <span><span className="lbl">INC:</span> <strong>{girvi.monthlyIncome || '30000'}</strong></span>
+            {girvi.aadharNumber && <span><span className="lbl">AADHAR:</span> <strong>{girvi.aadharNumber}</strong></span>}
           </div>
         </div>
 

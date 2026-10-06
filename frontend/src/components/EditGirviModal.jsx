@@ -20,6 +20,7 @@ export default function EditGirviModal({ girvi, onClose, onSave }) {
   const [relationName, setRelationName] = useState(girvi.relationName || '');
   const [mobile, setMobile] = useState(girvi.mobile || '');
   const [monthlyIncome, setMonthlyIncome] = useState(girvi.monthlyIncome !== undefined ? String(girvi.monthlyIncome) : '');
+  const [aadharNumber, setAadharNumber] = useState(girvi.aadharNumber || girvi.aadhar_number || '');
   const [address, setAddress] = useState(girvi.address || '');
   const [customerPhoto, setCustomerPhoto] = useState(girvi.customerPhoto || null);
 
@@ -120,6 +121,7 @@ export default function EditGirviModal({ girvi, onClose, onSave }) {
       relationName: relationName.trim(),
       mobile: mobile.trim(),
       monthlyIncome: monthlyIncome ? Number(monthlyIncome) : 0,
+      aadharNumber: aadharNumber.trim(),
       address: address.trim(),
       customerPhoto,
       
@@ -282,6 +284,20 @@ export default function EditGirviModal({ girvi, onClose, onSave }) {
                   style={{ paddingLeft: '14px' }}
                 />
               </div>
+
+              {/* Aadhar Card Number */}
+              <div className="input-group">
+                <label className="input-label">Aadhar Card Number (Optional)</label>
+                <input
+                  type="text"
+                  className="custom-input"
+                  placeholder="e.g. 1234 5678 9012"
+                  maxLength={14}
+                  value={aadharNumber}
+                  onChange={(e) => setAadharNumber(e.target.value)}
+                  style={{ paddingLeft: '14px' }}
+                />
+              </div>
             </div>
 
             {/* Address */}
@@ -295,19 +311,6 @@ export default function EditGirviModal({ girvi, onClose, onSave }) {
                 onChange={(e) => setAddress(e.target.value)}
                 required
                 style={{ paddingLeft: '14px', paddingTop: '10px', height: 'auto' }}
-              />
-            </div>
-
-            {/* Monthly Income */}
-            <div className="input-group" style={{ marginTop: '12px' }}>
-              <label className="input-label">Monthly Income (₹)</label>
-              <input
-                type="number"
-                className="custom-input"
-                placeholder="e.g. 50000"
-                value={monthlyIncome}
-                onChange={(e) => setMonthlyIncome(e.target.value)}
-                style={{ paddingLeft: '14px' }}
               />
             </div>
 

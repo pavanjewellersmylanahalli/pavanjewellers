@@ -288,6 +288,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
   const [relationName, setRelationName] = useState('');
   const [mobile, setMobile] = useState('');
   const [monthlyIncome, setMonthlyIncome] = useState('');
+  const [aadharNumber, setAadharNumber] = useState('');
   const [address, setAddress] = useState('');
   const [customerPhoto, setCustomerPhoto] = useState(null);
   const [isRegularCustomerFound, setIsRegularCustomerFound] = useState(false);
@@ -305,6 +306,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
         if (existing.relationName) setRelationName(existing.relationName);
         if (existing.address) setAddress(existing.address);
         if (existing.monthlyIncome) setMonthlyIncome(existing.monthlyIncome);
+        if (existing.aadharNumber) setAadharNumber(existing.aadharNumber);
         if (existing.customerPhoto) setCustomerPhoto(existing.customerPhoto);
 
         setIsRegularCustomerFound(true);
@@ -448,6 +450,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
       relationName: relationName.trim(),
       mobile: mobile.trim(),
       monthlyIncome: monthlyIncome ? Number(monthlyIncome) : 0,
+      aadharNumber: aadharNumber.trim(),
       address: address.trim(),
       customerPhoto,
       
@@ -487,6 +490,7 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
     setRelationName('');
     setMobile('');
     setMonthlyIncome('');
+    setAadharNumber('');
     setAddress('');
     setCustomerPhoto(null);
     setIsRegularCustomerFound(false);
@@ -776,6 +780,20 @@ export default function Dashboard({ shop, activeTab, setActiveTab }) {
                   value={monthlyIncome}
                   onChange={(e) => setMonthlyIncome(e.target.value)}
                   required
+                  style={{ paddingLeft: '16px' }}
+                />
+              </div>
+
+              {/* Aadhar Card Number (Optional) */}
+              <div className="input-group" style={{ marginTop: '12px' }}>
+                <label className="input-label">Aadhar Card Number (Optional)</label>
+                <input
+                  type="text"
+                  className="custom-input"
+                  placeholder="e.g. 1234 5678 9012"
+                  maxLength={14}
+                  value={aadharNumber}
+                  onChange={(e) => setAadharNumber(e.target.value)}
                   style={{ paddingLeft: '16px' }}
                 />
               </div>
